@@ -1,0 +1,2326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProcrastiKiller - Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: #ff6b6b;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-tab {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .nav-tab:hover,
+        .nav-tab.active {
+            background: #ff6b6b;
+        }
+
+        .stats {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .stat {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem 0;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-top: 1rem;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #333;
+            text-align: center;
+        }
+
+        /* Task Management */
+        .task-form {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .task-input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            min-width: 200px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .task-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .task-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            border-left: 4px solid #ff6b6b;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .task-info {
+            flex: 1;
+        }
+
+        .task-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .task-time {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .task-description {
+            color: #555;
+            font-size: 0.85rem;
+            font-style: italic;
+            margin: 0.25rem 0;
+        }
+
+        .task-rewards {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #dc3545, #c82333) !important;
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(45deg, #c82333, #bd2130) !important;
+        }
+
+        /* Gacha System */
+        .gacha-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .gacha-cost {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: #ff6b6b;
+        }
+
+        .weapon-inventory {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .weapon-card {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+
+        .weapon-card.rare {
+            border-color: #007bff;
+        }
+
+        .weapon-card.epic {
+            border-color: #6f42c1;
+        }
+
+        .weapon-card.legendary {
+            border-color: #fd7e14;
+        }
+
+        .weapon-name {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .weapon-damage {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
+        .weapon-rarity {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        .weapon-stars {
+            color: #ffd700;
+            font-size: 0.9rem;
+            margin: 0.25rem 0;
+        }
+
+        /* Battle Arena */
+        .battle-arena {
+            text-align: center;
+        }
+
+        .monster {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            border: 3px solid #dc3545;
+        }
+
+        .monster-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #dc3545;
+            margin-bottom: 1rem;
+        }
+
+        .monster-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .monster-stat {
+            text-align: center;
+        }
+
+        .monster-stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+
+        .battle-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .weapon-select {
+            padding: 0.5rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            min-width: 150px;
+        }
+
+        /* Crafting */
+        .crafting-section {
+            text-align: center;
+        }
+
+        .crafting-slots {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .crafting-slot-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .clear-slot-btn {
+            background: linear-gradient(45deg, #6c757d, #5a6268);
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .clear-slot-btn:hover {
+            background: linear-gradient(45deg, #5a6268, #495057);
+            transform: translateY(-1px);
+        }
+
+        .crafting-slot {
+            width: 150px;
+            height: 150px;
+            border: 3px dashed #ddd;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .crafting-slot:hover {
+            border-color: #ff6b6b;
+        }
+
+        .crafting-slot.selected {
+            border-color: #ff6b6b;
+            background: #fff5f5;
+        }
+
+        .crafting-slot.weapon {
+            border-style: solid;
+            background: white;
+        }
+
+        .merge-btn {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            margin-top: 1rem;
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.3rem;
+        }
+
+        .close {
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .close:hover {
+            opacity: 0.7;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .weapon-selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .weapon-selection-item {
+            background: #f8f9fa;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .weapon-selection-item:hover {
+            border-color: #ff6b6b;
+            background: #fff5f5;
+            transform: translateY(-2px);
+        }
+
+        .weapon-selection-item.selected {
+            border-color: #ff6b6b;
+            background: #fff5f5;
+        }
+
+        .weapon-selection-item .weapon-name {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .weapon-selection-item .weapon-damage {
+            color: #ff6b6b;
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+
+        .weapon-selection-item .weapon-rarity {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: capitalize;
+        }
+
+        .weapon-selection-item .weapon-count {
+            background: #ff6b6b;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin: 0.5rem auto 0;
+        }
+
+        /* Profile */
+        .profile-section {
+            text-align: center;
+        }
+
+        .profile-card {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            font-weight: bold;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .profile-avatar .upload-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 50%;
+        }
+
+        .profile-avatar:hover .upload-overlay {
+            opacity: 1;
+        }
+
+        .profile-upload {
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .upload-btn {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .remove-avatar-btn {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .remove-avatar-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .profile-customization {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            border: 2px solid #f8f9fa;
+        }
+
+        .profile-customization h4 {
+            color: #333;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .customization-options {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .profile-editor {
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .profile-editor h4 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        .edit-form {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #ff6b6b;
+        }
+
+        .avatar-preview {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .avatar-actions {
+            flex-direction: row;
+            justify-content: center;
+        }
+
+        .avatar-styles {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+        }
+
+        .avatar-style-option {
+            text-align: center;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-style-option:hover {
+            border-color: #ff6b6b;
+            background: #fff5f5;
+        }
+
+        .avatar-style-option.selected {
+            border-color: #ff6b6b;
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .avatar-style-preview {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 0.5rem;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .avatar-style-preview.square {
+            border-radius: 8px;
+        }
+
+        .avatar-style-preview.hexagon {
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        }
+
+        .avatar-style-option.locked {
+            opacity: 0.6;
+            cursor: not-allowed;
+            position: relative;
+        }
+
+        .avatar-style-option.locked:hover {
+            border-color: #dc3545;
+            background: #fff5f5;
+        }
+
+        .avatar-style-preview.locked {
+            background: linear-gradient(45deg, #6c757d, #495057);
+            color: #fff;
+        }
+
+        .avatar-style-preview.diamond {
+            background: linear-gradient(45deg, #e91e63, #9c27b0);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+
+        .avatar-style-preview.star {
+            background: linear-gradient(45deg, #ff9800, #ff5722);
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+        }
+
+        .avatar-style-preview.crown {
+            background: linear-gradient(45deg, #ffd700, #ffb300);
+            clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%, 30% 40%, 50% 20%, 70% 40%);
+        }
+
+        .avatar-style-preview.flame {
+            background: linear-gradient(45deg, #ff5722, #f44336);
+            clip-path: polygon(50% 0%, 100% 50%, 80% 100%, 20% 100%, 0% 50%);
+        }
+
+        .avatar-style-preview.crystal {
+            background: linear-gradient(45deg, #00bcd4, #009688);
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+        }
+
+        .avatar-style-preview.galaxy {
+            background: linear-gradient(45deg, #673ab7, #3f51b5);
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        }
+
+        .save-btn {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .edit-toggle {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .edit-toggle:hover {
+            transform: translateY(-2px);
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .profile-stat {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .profile-stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+
+        .profile-stat-label {
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        .best-weapon {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            border: 2px solid #ff6b6b;
+        }
+
+        .monsters-defeated {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .monster-badge {
+            background: white;
+            padding: 0.5rem;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header .container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-tabs {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .stats {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .task-form {
+                flex-direction: column;
+            }
+
+            .task-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .crafting-slots {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .profile-editor {
+                padding: 1rem;
+                margin: 1rem 0;
+            }
+
+            .avatar-styles {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.5rem;
+            }
+
+            .avatar-style-option {
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
+
+            .avatar-style-preview {
+                width: 40px;
+                height: 40px;
+            }
+
+            .form-group input,
+            .form-group select {
+                padding: 0.6rem;
+                font-size: 0.9rem;
+            }
+
+            .save-btn {
+                padding: 0.8rem 1.5rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        .profile-editor .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .profile-editor .form-group input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .profile-avatar.square {
+            border-radius: 10px;
+        }
+
+        .profile-avatar.square img {
+            border-radius: 8px;
+        }
+
+        .profile-avatar.hexagon {
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        }
+
+        .profile-avatar.hexagon img {
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        }
+
+        .profile-avatar.diamond {
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+
+        .profile-avatar.diamond img {
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+
+        .profile-avatar.star {
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+        }
+
+        .profile-avatar.star img {
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+        }
+
+        .profile-avatar.crown {
+            clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%, 30% 40%, 50% 20%, 70% 40%);
+        }
+
+        .profile-avatar.crown img {
+            clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%, 30% 40%, 50% 20%, 70% 40%);
+        }
+
+        .profile-avatar.flame {
+            clip-path: polygon(50% 0%, 100% 50%, 80% 100%, 20% 100%, 0% 50%);
+        }
+
+        .profile-avatar.flame img {
+            clip-path: polygon(50% 0%, 100% 50%, 80% 100%, 20% 100%, 0% 50%);
+        }
+
+        .profile-avatar.crystal {
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+        }
+
+        .profile-avatar.crystal img {
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+        }
+
+        .profile-avatar.galaxy {
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        }
+
+        .profile-avatar.galaxy img {
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        }
+
+        .style-status {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        .unlocked {
+            color: #28a745;
+        }
+
+        .locked {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <a href="index.html" class="logo">ProcrastiKiller</a>
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showTab('tasks')">Tasks</button>
+                <button class="nav-tab" onclick="showTab('gacha')">Gacha</button>
+                <button class="nav-tab" onclick="showTab('battle')">Battle</button>
+                <button class="nav-tab" onclick="showTab('crafting')">Crafting</button>
+                <button class="nav-tab" onclick="showTab('profile')">Profile</button>
+            </div>
+            <div class="stats">
+                <div class="stat">Level: <span id="player-level">1</span></div>
+                <div class="stat">XP: <span id="player-xp">0</span></div>
+                <div class="stat">Coins: <span id="player-coins">0</span></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Tasks Tab -->
+            <div id="tasks" class="tab-content active">
+                <h2 class="section-title">Task Management</h2>
+                <div class="task-form">
+                    <input type="text" id="task-input" class="task-input" placeholder="Enter your task title..." onkeypress="if(event.key === 'Enter') addTask()">
+                    <input type="text" id="task-description" class="task-input" placeholder="Enter task description (optional)" onkeypress="if(event.key === 'Enter') addTask()">
+                    <button onclick="addTask()" class="btn">Add Task</button>
+                </div>
+                <div id="task-list" class="task-list"></div>
+            </div>
+
+            <!-- Gacha Tab -->
+            <div id="gacha" class="tab-content">
+                <h2 class="section-title">Weapon Gacha</h2>
+                <div class="gacha-section">
+                    <div class="gacha-cost">Cost: 100 coins per pull</div>
+                    <button onclick="pullWeapon()" class="btn">Pull Weapon</button>
+                </div>
+                <h3>Your Weapons</h3>
+                <div id="weapon-inventory" class="weapon-inventory"></div>
+            </div>
+
+            <!-- Battle Tab -->
+            <div id="battle" class="tab-content">
+                <h2 class="section-title">Battle Arena</h2>
+                <div id="battle-arena" class="battle-arena">
+                    <div id="monster" class="monster" style="display: none;">
+                        <div class="monster-name" id="monster-name"></div>
+                        <div class="monster-stats">
+                            <div class="monster-stat">
+                                <div class="monster-stat-value" id="monster-hp"></div>
+                                <div>HP</div>
+                            </div>
+                            <div class="monster-stat">
+                                <div class="monster-stat-value" id="monster-damage"></div>
+                                <div>Damage</div>
+                            </div>
+                        </div>
+                        <div class="battle-controls">
+                            <select id="weapon-select" class="weapon-select">
+                                <option value="fists">Fists (5 damage)</option>
+                            </select>
+                            <button onclick="attackMonster()" class="btn">Attack</button>
+                        </div>
+                    </div>
+                    <div id="no-monster">
+                        <p>No monsters currently spawned. Check back later!</p>
+                    </div>
+                    <div style="text-align: center; margin-top: 2rem;">
+                        <button onclick="forceSpawnMonster()" class="btn" style="background: linear-gradient(45deg, #28a745, #20c997);">
+                            Spawn Monster
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Crafting Tab -->
+            <div id="crafting" class="tab-content">
+                <h2 class="section-title">Weapon Crafting</h2>
+                <div class="crafting-section">
+                    <p>Select two weapons of the same type and star count to merge. Each merge increases damage by 1.5x and adds a star ⭐ (Max: 5 stars)</p>
+                    <div class="crafting-slots">
+                        <div class="crafting-slot-container">
+                            <div class="crafting-slot" onclick="showWeaponSelector(0)">Slot 1</div>
+                            <button class="clear-slot-btn" onclick="clearCraftingSlot(0)" style="display: none;">Clear</button>
+                        </div>
+                        <div class="crafting-slot-container">
+                            <div class="crafting-slot" onclick="showWeaponSelector(1)">Slot 2</div>
+                            <button class="clear-slot-btn" onclick="clearCraftingSlot(1)" style="display: none;">Clear</button>
+                        </div>
+                    </div>
+                    <button onclick="mergeWeapons()" class="btn merge-btn">Merge Weapons</button>
+                </div>
+            </div>
+
+            <!-- Weapon Selection Modal -->
+            <div id="weapon-selector-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Select Weapon for Slot <span id="slot-number"></span></h3>
+                        <span class="close" onclick="closeWeaponSelector()">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <div id="weapon-selection-grid" class="weapon-selection-grid">
+                            <!-- Weapons will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Tab -->
+            <div id="profile" class="tab-content">
+                <h2 class="section-title">Player Profile</h2>
+                <div class="profile-section">
+                    <div class="profile-card">
+                        <div class="profile-avatar" id="profile-avatar" onclick="document.getElementById('avatar-upload').click()">
+                            <div class="upload-overlay">Click to upload</div>
+                        </div>
+                        <input type="file" id="avatar-upload" accept="image/*" style="display: none;" onchange="uploadAvatar(event)">
+                        
+                        <div class="profile-customization">
+                            <h4>Profile Customization</h4>
+                            <div class="customization-options">
+                                <button class="edit-toggle" onclick="toggleProfileEditor()">Edit Profile</button>
+                            </div>
+                        </div>
+
+                        <!-- Profile Editor -->
+                        <div id="profile-editor" class="profile-editor" style="display: none;">
+                            <h4>Edit Profile</h4>
+                            <form class="edit-form" onsubmit="saveProfile(event)">
+                                <div class="form-group">
+                                    <label for="username-input">Username</label>
+                                    <input type="text" id="username-input" value="Player" maxlength="20" placeholder="Enter your username">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Profile Picture</label>
+                                    <div class="avatar-preview">
+                                        <div id="edit-avatar-preview" class="profile-avatar">
+                                            <div>1</div>
+                                        </div>
+                                        <div class="avatar-actions">
+                                            <button type="button" class="upload-btn" onclick="document.getElementById('avatar-upload').click()">Upload Photo</button>
+                                            <button type="button" class="remove-avatar-btn" onclick="removeAvatarFromEditor()">Remove Photo</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Avatar Style</label>
+                                    <div class="avatar-styles">
+                                        <div class="avatar-style-option selected" data-style="circle" onclick="selectAvatarStyle('circle')">
+                                            <div class="avatar-style-preview">1</div>
+                                            <div>Circle</div>
+                                            <div class="style-status unlocked">Unlocked</div>
+                                        </div>
+                                        <div class="avatar-style-option" data-style="square" onclick="selectAvatarStyle('square')">
+                                            <div class="avatar-style-preview square">1</div>
+                                            <div>Square</div>
+                                            <div class="style-status unlocked">Unlocked</div>
+                                        </div>
+                                        <div class="avatar-style-option" data-style="hexagon" onclick="selectAvatarStyle('hexagon')">
+                                            <div class="avatar-style-preview hexagon">1</div>
+                                            <div>Hexagon</div>
+                                            <div class="style-status unlocked">Unlocked</div>
+                                        </div>
+                                        <div class="avatar-style-option locked" data-style="diamond" onclick="showLockedMessage('diamond', 5)">
+                                            <div class="avatar-style-preview diamond locked">5</div>
+                                            <div>Diamond</div>
+                                            <div class="style-status locked">Level 5</div>
+                                        </div>
+                                        <div class="avatar-style-option locked" data-style="star" onclick="showLockedMessage('star', 10)">
+                                            <div class="avatar-style-preview star locked">10</div>
+                                            <div>Star</div>
+                                            <div class="style-status locked">Level 10</div>
+                                        </div>
+                                        <div class="avatar-style-option locked" data-style="crown" onclick="showLockedMessage('crown', 15)">
+                                            <div class="avatar-style-preview crown locked">15</div>
+                                            <div>Crown</div>
+                                            <div class="style-status locked">Level 15</div>
+                                        </div>
+                                        <div class="avatar-style-option locked" data-style="flame" onclick="showLockedMessage('flame', 20)">
+                                            <div class="avatar-style-preview flame locked">20</div>
+                                            <div>Flame</div>
+                                            <div class="style-status locked">Level 20</div>
+                                        </div>
+                                        <div class="avatar-style-option locked" data-style="crystal" onclick="showLockedMessage('crystal', 25)">
+                                            <div class="avatar-style-preview crystal locked">25</div>
+                                            <div>Crystal</div>
+                                            <div class="style-status locked">Level 25</div>
+                                        </div>
+                                        <div class="avatar-style-option locked" data-style="galaxy" onclick="showLockedMessage('galaxy', 30)">
+                                            <div class="avatar-style-preview galaxy locked">30</div>
+                                            <div>Galaxy</div>
+                                            <div class="style-status locked">Level 30</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="theme-select">Theme</label>
+                                    <select id="theme-select">
+                                        <option value="default">Default</option>
+                                        <option value="dark">Dark</option>
+                                        <option value="light">Light</option>
+                                        <option value="colorful">Colorful</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>
+                                        <input type="checkbox" id="show-stats" checked> Show Statistics
+                                    </label>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>
+                                        <input type="checkbox" id="notifications" checked> Enable Notifications
+                                    </label>
+                                </div>
+
+                                <button type="submit" class="save-btn">Save Changes</button>
+                            </form>
+                        </div>
+                        
+                        <h3 id="profile-name">Player</h3>
+                        <div class="profile-stats">
+                            <div class="profile-stat">
+                                <div class="profile-stat-value" id="profile-level">1</div>
+                                <div class="profile-stat-label">Level</div>
+                            </div>
+                            <div class="profile-stat">
+                                <div class="profile-stat-value" id="profile-xp">0</div>
+                                <div class="profile-stat-label">Total XP</div>
+                            </div>
+                            <div class="profile-stat">
+                                <div class="profile-stat-value" id="profile-coins">0</div>
+                                <div class="profile-stat-label">Total Coins</div>
+                            </div>
+                            <div class="profile-stat">
+                                <div class="profile-stat-value" id="profile-tasks">0</div>
+                                <div class="profile-stat-label">Tasks Completed</div>
+                            </div>
+                        </div>
+                        <div class="best-weapon">
+                            <h4>Best Weapon</h4>
+                            <div id="best-weapon-info">No weapons yet</div>
+                        </div>
+                        <div>
+                            <h4>Monsters Defeated</h4>
+                            <div id="monsters-defeated" class="monsters-defeated"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Game state
+        let gameState = {
+            level: 1,
+            xp: 0,
+            coins: 0,
+            tasks: [],
+            weapons: [],
+            monstersDefeated: [],
+            craftingSlots: [null, null],
+            currentMonster: null,
+            profileImage: null,
+            monsterDifficulty: 0,
+            monstersDefeatedCount: 0,
+            lastMonsterSpawn: 0,
+            username: "Player",
+            profileSettings: {
+                theme: "default",
+                avatarStyle: "circle",
+                showStats: true,
+                notifications: true
+            }
+        };
+
+        // Weapon definitions
+        const weapons = [
+            { name: "Wooden Sword", damage: 10, rarity: "common" },
+            { name: "Iron Sword", damage: 20, rarity: "common" },
+            { name: "Steel Sword", damage: 35, rarity: "rare" },
+            { name: "Magic Staff", damage: 50, rarity: "epic" },
+            { name: "Dragon Blade", damage: 100, rarity: "legendary" }
+        ];
+
+        // Monster definitions with base stats
+        const baseMonsters = [
+            { name: "Goblin", baseHp: 200, baseDamage: 5, baseXpCost: 3, baseCoinReward: 15 },
+            { name: "Orc", baseHp: 400, baseDamage: 10, baseXpCost: 6, baseCoinReward: 30 },
+            { name: "Troll", baseHp: 800, baseDamage: 20, baseXpCost: 12, baseCoinReward: 60 },
+            { name: "Dragon", baseHp: 1600, baseDamage: 50, baseXpCost: 30, baseCoinReward: 150 },
+            { name: "Demon Lord", baseHp: 3200, baseDamage: 100, baseXpCost: 60, baseCoinReward: 300 }
+        ];
+
+        // Avatar style requirements
+        const avatarStyleRequirements = {
+            'circle': 1,
+            'square': 1,
+            'hexagon': 1,
+            'diamond': 5,
+            'star': 10,
+            'crown': 15,
+            'flame': 20,
+            'crystal': 25,
+            'galaxy': 30
+        };
+
+        // Check if avatar style is unlocked
+        function isAvatarStyleUnlocked(style) {
+            const requiredLevel = avatarStyleRequirements[style] || 1;
+            return gameState.level >= requiredLevel;
+        }
+
+        // Show locked message
+        function showLockedMessage(style, requiredLevel) {
+            alert(`This avatar style is locked! Reach level ${requiredLevel} to unlock it.`);
+        }
+
+        // Update avatar style selection with unlock status
+        function updateAvatarStyleSelection(selectedStyle) {
+            document.querySelectorAll('.avatar-style-option').forEach(option => {
+                option.classList.remove('selected');
+                
+                // Get the style name from the data attribute
+                const styleName = option.getAttribute('data-style');
+                
+                if (styleName) {
+                    if (!isAvatarStyleUnlocked(styleName)) {
+                        option.classList.add('locked');
+                        option.onclick = () => showLockedMessage(styleName, avatarStyleRequirements[styleName]);
+                        // Update status text
+                        const statusElement = option.querySelector('.style-status');
+                        if (statusElement) {
+                            statusElement.textContent = `Level ${avatarStyleRequirements[styleName]}`;
+                            statusElement.className = 'style-status locked';
+                        }
+                    } else {
+                        option.classList.remove('locked');
+                        option.onclick = () => selectAvatarStyle(styleName);
+                        // Update status text
+                        const statusElement = option.querySelector('.style-status');
+                        if (statusElement) {
+                            statusElement.textContent = 'Unlocked';
+                            statusElement.className = 'style-status unlocked';
+                        }
+                    }
+                }
+            });
+            
+            // Select the current style if it's unlocked
+            const selectedOption = document.querySelector(`[data-style="${selectedStyle}"]`);
+            if (selectedOption && !selectedOption.classList.contains('locked')) {
+                selectedOption.classList.add('selected');
+            }
+        }
+
+        // Select avatar style (updated to check unlock status)
+        function selectAvatarStyle(style) {
+            if (!isAvatarStyleUnlocked(style)) {
+                showLockedMessage(style, avatarStyleRequirements[style]);
+                return;
+            }
+            
+            // Update visual selection
+            updateAvatarStyleSelection(style);
+            
+            // Update game state
+            gameState.profileSettings.avatarStyle = style;
+            
+            // Update profile display
+            updateProfile();
+            updateEditAvatarPreview();
+        }
+
+        // Initialize game
+        function initGame() {
+            loadGameState();
+            updateUI();
+            renderTasks();
+            renderWeapons();
+            updateProfile();
+            
+            // Force spawn initial monster immediately
+            gameState.currentMonster = null; // Clear any existing monster
+            spawnMonster();
+            
+            // Start timer to update potential rewards every 30 seconds
+            setInterval(updatePotentialRewards, 30000);
+            
+            // Start automatic monster spawning
+            startAutoMonsterSpawning();
+        }
+
+        // Load game state from localStorage
+        function loadGameState() {
+            const saved = localStorage.getItem('procrastikiller');
+            if (saved) {
+                gameState = { ...gameState, ...JSON.parse(saved) };
+                
+                // Migrate existing weapons to have stars property
+                if (gameState.weapons && gameState.weapons.length > 0) {
+                    gameState.weapons.forEach(weapon => {
+                        if (weapon.stars === undefined) {
+                            // Calculate stars based on damage compared to base weapon
+                            const baseWeapon = weapons.find(w => w.name === weapon.name);
+                            if (baseWeapon) {
+                                let calculatedStars = 0;
+                                let currentDamage = baseWeapon.damage;
+                                
+                                // Calculate how many times this weapon has been merged
+                                while (currentDamage < weapon.damage && calculatedStars < 5) {
+                                    currentDamage = Math.floor(currentDamage * 1.5);
+                                    calculatedStars++;
+                                }
+                                
+                                weapon.stars = Math.min(calculatedStars, 5);
+                            } else {
+                                weapon.stars = 0;
+                            }
+                        }
+                    });
+                }
+            }
+        }
+
+        // Save game state to localStorage
+        function saveGameState() {
+            localStorage.setItem('procrastikiller', JSON.stringify(gameState));
+        }
+
+        // Update UI
+        function updateUI() {
+            document.getElementById('player-level').textContent = gameState.level;
+            document.getElementById('player-xp').textContent = gameState.xp;
+            document.getElementById('player-coins').textContent = gameState.coins;
+        }
+
+        // Tab navigation
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Task management
+        function addTask() {
+            const input = document.getElementById('task-input');
+            const descriptionInput = document.getElementById('task-description');
+            const taskText = input.value.trim();
+            const taskDescription = descriptionInput.value.trim();
+            
+            if (taskText) {
+                const task = {
+                    id: Date.now(),
+                    title: taskText,
+                    description: taskDescription,
+                    completed: false,
+                    started: false,
+                    startTime: null,
+                    endTime: null
+                };
+                
+                gameState.tasks.push(task);
+                input.value = '';
+                descriptionInput.value = '';
+                renderTasks();
+                saveGameState();
+            }
+        }
+
+        function startTask(taskId) {
+            const task = gameState.tasks.find(t => t.id === taskId);
+            if (task && !task.completed && !task.started) {
+                task.started = true;
+                task.startTime = Date.now();
+                renderTasks();
+                saveGameState();
+                
+                // Show success message
+                const taskElement = document.querySelector(`[onclick="startTask(${taskId})"]`);
+                if (taskElement) {
+                    const originalText = taskElement.textContent;
+                    taskElement.textContent = 'Started!';
+                    taskElement.style.background = 'linear-gradient(45deg, #28a745, #20c997)';
+                    setTimeout(() => {
+                        taskElement.textContent = originalText;
+                        taskElement.style.background = 'linear-gradient(45deg, #28a745, #20c997)';
+                    }, 1000);
+                }
+            }
+        }
+
+        function deleteTask(taskId) {
+            if (confirm('Are you sure you want to delete this task?')) {
+                gameState.tasks = gameState.tasks.filter(t => t.id !== taskId);
+                renderTasks();
+                saveGameState();
+            }
+        }
+
+        function completeTask(taskId) {
+            const task = gameState.tasks.find(t => t.id === taskId);
+            if (task && !task.completed && task.started) {
+                task.completed = true;
+                task.endTime = Date.now();
+                
+                const timeSpent = (task.endTime - task.startTime) / (1000 * 60); // minutes
+                const coins = calculateCoinReward(timeSpent);
+                const xp = calculateXPReward(timeSpent);
+                
+                gameState.coins += coins;
+                gameState.xp += xp;
+                
+                // Level up check
+                const newLevel = Math.floor(gameState.xp / 100) + 1;
+                if (newLevel > gameState.level) {
+                    gameState.level = newLevel;
+                    alert(`Level up! You are now level ${gameState.level}!`);
+                    
+                    // Check for new avatar style unlocks
+                    checkAvatarStyleUnlocks();
+                }
+                
+                updateUI();
+                renderTasks();
+                saveGameState();
+            } else if (task && !task.started) {
+                alert('Please start the task first before completing it!');
+            }
+        }
+
+        function calculateCoinReward(timeSpent) {
+            if (timeSpent < 5) return 0;
+            const intervals = Math.floor((timeSpent - 5) / 5);
+            return Math.min(intervals * 5, 60);
+        }
+
+        function calculateXPReward(timeSpent) {
+            if (timeSpent < 5) return 10;
+            const intervals = Math.floor((timeSpent - 5) / 5);
+            return Math.min(10 + intervals * 10, 120);
+        }
+
+        function renderTasks() {
+            const taskList = document.getElementById('task-list');
+            taskList.innerHTML = '';
+            
+            gameState.tasks.forEach(task => {
+                const taskElement = document.createElement('div');
+                taskElement.className = 'task-item';
+                
+                if (task.completed) {
+                    const timeSpent = (task.endTime - task.startTime) / (1000 * 60);
+                    const coins = calculateCoinReward(timeSpent);
+                    const xp = calculateXPReward(timeSpent);
+                    
+                    taskElement.innerHTML = `
+                        <div class="task-info">
+                            <div class="task-title">${task.title} ✓</div>
+                            ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+                            <div class="task-time">Completed in ${timeSpent.toFixed(1)} minutes</div>
+                        </div>
+                        <div class="task-actions">
+                            <div class="task-rewards">
+                                +${coins} coins, +${xp} XP
+                            </div>
+                            <button onclick="deleteTask(${task.id})" class="btn btn-danger" style="background: linear-gradient(45deg, #dc3545, #c82333);">Delete</button>
+                        </div>
+                    `;
+                } else if (task.started) {
+                    // Calculate current time spent and potential rewards
+                    const currentTime = Date.now();
+                    const timeSpent = (currentTime - task.startTime) / (1000 * 60);
+                    const potentialCoins = calculateCoinReward(timeSpent);
+                    const potentialXP = calculateXPReward(timeSpent);
+                    
+                    taskElement.innerHTML = `
+                        <div class="task-info">
+                            <div class="task-title">${task.title}</div>
+                            ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+                            <div class="task-time">In progress... (${timeSpent.toFixed(1)} minutes)</div>
+                            <div class="task-rewards" style="color: #ff6b6b; font-weight: bold; margin-top: 0.5rem;">
+                                Potential rewards: +${potentialCoins} coins, +${potentialXP} XP
+                            </div>
+                        </div>
+                        <div class="task-actions">
+                            <button onclick="completeTask(${task.id})" class="btn">Complete</button>
+                            <button onclick="deleteTask(${task.id})" class="btn btn-danger" style="background: linear-gradient(45deg, #dc3545, #c82333);">Delete</button>
+                        </div>
+                    `;
+                } else {
+                    // Task not started yet
+                    taskElement.innerHTML = `
+                        <div class="task-info">
+                            <div class="task-title">${task.title}</div>
+                            ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+                            <div class="task-time" style="color: #666;">Not started yet</div>
+                        </div>
+                        <div class="task-actions">
+                            <button onclick="startTask(${task.id})" class="btn" style="background: linear-gradient(45deg, #28a745, #20c997);">Start Task</button>
+                            <button onclick="deleteTask(${task.id})" class="btn btn-danger" style="background: linear-gradient(45deg, #dc3545, #c82333);">Delete</button>
+                        </div>
+                    `;
+                }
+                
+                taskList.appendChild(taskElement);
+            });
+        }
+
+        // Gacha system
+        function pullWeapon() {
+            if (gameState.coins < 100) {
+                alert('Not enough coins! You need 100 coins to pull a weapon.');
+                return;
+            }
+            
+            gameState.coins -= 100;
+            
+            // Random weapon selection with rarity weights
+            const random = Math.random();
+            let selectedWeapon;
+            
+            if (random < 0.5) {
+                selectedWeapon = weapons[0]; // Common
+            } else if (random < 0.8) {
+                selectedWeapon = weapons[1]; // Common
+            } else if (random < 0.95) {
+                selectedWeapon = weapons[2]; // Rare
+            } else if (random < 0.99) {
+                selectedWeapon = weapons[3]; // Epic
+            } else {
+                selectedWeapon = weapons[4]; // Legendary
+            }
+            
+            const weapon = {
+                ...selectedWeapon,
+                id: Date.now() + Math.random(),
+                stars: 0
+            };
+            
+            gameState.weapons.push(weapon);
+            
+            updateUI();
+            renderWeapons();
+            saveGameState();
+            
+            alert(`You pulled: ${weapon.name} (${weapon.damage} damage, ${weapon.rarity})`);
+        }
+
+        function renderWeapons() {
+            const inventory = document.getElementById('weapon-inventory');
+            inventory.innerHTML = '';
+            
+            gameState.weapons.forEach(weapon => {
+                const weaponElement = document.createElement('div');
+                weaponElement.className = `weapon-card ${weapon.rarity}`;
+                
+                // Create star display
+                const stars = weapon.stars || 0;
+                const starDisplay = '⭐'.repeat(stars);
+                
+                weaponElement.innerHTML = `
+                    <div class="weapon-name">${weapon.name}</div>
+                    <div class="weapon-damage">${weapon.damage} damage</div>
+                    <div class="weapon-stars">${starDisplay} <span style="color: #ffd700; font-weight: bold;">(${stars}★)</span></div>
+                    <div class="weapon-rarity">${weapon.rarity}</div>
+                `;
+                inventory.appendChild(weaponElement);
+            });
+            
+            updateWeaponSelect();
+        }
+
+        // Battle system
+        function spawnMonster() {
+            if (!gameState.currentMonster) {
+                const monster = generateMonster();
+                gameState.currentMonster = {
+                    ...monster,
+                    currentHp: monster.hp
+                };
+                
+                updateMonsterDisplay();
+            }
+        }
+
+        function updateMonsterDisplay() {
+            const monsterElement = document.getElementById('monster');
+            const noMonsterElement = document.getElementById('no-monster');
+            
+            if (gameState.currentMonster) {
+                monsterElement.style.display = 'block';
+                noMonsterElement.style.display = 'none';
+                
+                const difficultyBonus = Math.floor((gameState.monsterDifficulty - 1) * 0.15 * 100);
+                
+                document.getElementById('monster-name').textContent = `${gameState.currentMonster.name} (Difficulty: ${gameState.currentMonster.difficulty})`;
+                document.getElementById('monster-hp').textContent = gameState.currentMonster.currentHp;
+                document.getElementById('monster-damage').textContent = gameState.currentMonster.damage;
+                
+                // Add difficulty info to monster display
+                const monsterStats = monsterElement.querySelector('.monster-stats');
+                if (monsterStats && !monsterStats.querySelector('.difficulty-info')) {
+                    const difficultyDiv = document.createElement('div');
+                    difficultyDiv.className = 'monster-stat difficulty-info';
+                    difficultyDiv.innerHTML = `
+                        <div class="monster-stat-value" style="color: #ff6b6b;">+${difficultyBonus}%</div>
+                        <div>Reward Bonus</div>
+                    `;
+                    monsterStats.appendChild(difficultyDiv);
+                }
+            } else {
+                monsterElement.style.display = 'none';
+                noMonsterElement.style.display = 'block';
+                
+                // Show next spawn info
+                const timeSinceLastSpawn = Date.now() - gameState.lastMonsterSpawn;
+                const spawnDelay = Math.max(5000, 30000 - (gameState.monsterDifficulty * 500));
+                const timeRemaining = Math.max(0, spawnDelay - timeSinceLastSpawn);
+                
+                if (timeRemaining > 0) {
+                    noMonsterElement.innerHTML = `
+                        <p>No monsters currently spawned.</p>
+                        <p style="color: #ff6b6b; font-weight: bold;">Next monster in ${Math.ceil(timeRemaining / 1000)} seconds</p>
+                        <p style="font-size: 0.9rem; color: #666;">Current Difficulty: ${gameState.monsterDifficulty}</p>
+                    `;
+                } else {
+                    noMonsterElement.innerHTML = `
+                        <p>Spawning new monster...</p>
+                        <p style="font-size: 0.9rem; color: #666;">Current Difficulty: ${gameState.monsterDifficulty}</p>
+                    `;
+                }
+            }
+        }
+
+        function attackMonster() {
+            if (!gameState.currentMonster) return;
+            
+            const weaponSelect = document.getElementById('weapon-select');
+            const selectedWeapon = weaponSelect.value;
+            
+            let damage = 5; // Base damage for fists
+            
+            if (selectedWeapon !== 'fists') {
+                const weapon = gameState.weapons.find(w => w.id == selectedWeapon);
+                if (weapon) {
+                    // Calculate damage as original weapon damage times 1.5
+                    const originalDamage = getOriginalWeaponDamage(weapon.name);
+                    damage = Math.floor(originalDamage * 1.5);
+                }
+            }
+            
+            if (gameState.xp < gameState.currentMonster.xpCost) {
+                alert(`Not enough XP! You need ${gameState.currentMonster.xpCost} XP to attack.`);
+                return;
+            }
+            
+            gameState.xp -= gameState.currentMonster.xpCost;
+            gameState.currentMonster.currentHp -= damage;
+            
+            updateUI();
+            updateMonsterDisplay();
+            
+            if (gameState.currentMonster.currentHp <= 0) {
+                // Monster defeated
+                const coinReward = gameState.currentMonster.coinReward;
+                gameState.coins += coinReward;
+                gameState.monstersDefeated.push(gameState.currentMonster.name);
+                gameState.monstersDefeatedCount++;
+                
+                // Increase difficulty
+                gameState.monsterDifficulty++;
+                
+                // Clear current monster and set spawn time
+                gameState.currentMonster = null;
+                gameState.lastMonsterSpawn = Date.now();
+                
+                updateUI();
+                updateMonsterDisplay();
+                updateProfile();
+                saveGameState();
+                
+                // Show reward message with difficulty info
+                const difficultyBonus = Math.floor((gameState.monsterDifficulty - 1) * 0.15 * 100);
+                alert(`Monster defeated! You earned ${coinReward} coins!\n\nDifficulty: ${gameState.monsterDifficulty}\nDifficulty Bonus: +${difficultyBonus}% rewards`);
+                
+                // Spawn new monster after delay (faster as difficulty increases)
+                const spawnDelay = Math.max(2000, 5000 - (gameState.monsterDifficulty * 100));
+                setTimeout(() => {
+                    spawnMonster();
+                }, spawnDelay);
+            }
+        }
+
+        // Get original weapon damage by name
+        function getOriginalWeaponDamage(weaponName) {
+            const weapon = weapons.find(w => w.name === weaponName);
+            return weapon ? weapon.damage : 5; // Default to 5 if weapon not found
+        }
+
+        function updateWeaponSelect() {
+            const weaponSelect = document.getElementById('weapon-select');
+            weaponSelect.innerHTML = '<option value="fists">Fists (5 damage)</option>';
+            
+            gameState.weapons.forEach(weapon => {
+                const option = document.createElement('option');
+                option.value = weapon.id;
+                const starDisplay = '⭐'.repeat(weapon.stars || 0);
+                const stars = weapon.stars || 0;
+                option.textContent = `${weapon.name} (${weapon.damage} damage) ${starDisplay} (${stars}★)`;
+                weaponSelect.appendChild(option);
+            });
+        }
+
+        // Crafting system
+        let currentCraftingSlot = null;
+
+        function showWeaponSelector(slotIndex) {
+            if (gameState.weapons.length === 0) {
+                alert('No weapons available for crafting!');
+                return;
+            }
+            
+            currentCraftingSlot = slotIndex;
+            document.getElementById('slot-number').textContent = slotIndex + 1;
+            
+            // Group weapons by name and star count
+            const weaponGroups = {};
+            gameState.weapons.forEach(weapon => {
+                const stars = weapon.stars || 0;
+                const key = `${weapon.name}_${stars}`;
+                
+                if (!weaponGroups[key]) {
+                    weaponGroups[key] = {
+                        name: weapon.name,
+                        damage: weapon.damage,
+                        rarity: weapon.rarity,
+                        stars: stars,
+                        count: 0,
+                        instances: []
+                    };
+                }
+                weaponGroups[key].count++;
+                weaponGroups[key].instances.push(weapon);
+            });
+            
+            // Populate weapon selection grid
+            const grid = document.getElementById('weapon-selection-grid');
+            grid.innerHTML = '';
+            
+            Object.values(weaponGroups).forEach(group => {
+                const item = document.createElement('div');
+                item.className = 'weapon-selection-item';
+                item.onclick = () => selectWeaponForCrafting(group.instances[0]);
+                
+                const starDisplay = '⭐'.repeat(group.stars);
+                item.innerHTML = `
+                    <div class="weapon-name">${group.name}</div>
+                    <div class="weapon-damage">${group.damage} damage</div>
+                    <div class="weapon-stars" style="color: #ffd700; margin: 0.25rem 0; font-weight: bold;">${starDisplay} (${group.stars}★)</div>
+                    <div class="weapon-rarity">${group.rarity}</div>
+                    <div class="weapon-count">${group.count}</div>
+                `;
+                
+                grid.appendChild(item);
+            });
+            
+            // Show modal
+            document.getElementById('weapon-selector-modal').style.display = 'block';
+        }
+
+        function closeWeaponSelector() {
+            document.getElementById('weapon-selector-modal').style.display = 'none';
+            currentCraftingSlot = null;
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('weapon-selector-modal');
+            if (event.target === modal) {
+                closeWeaponSelector();
+            }
+        }
+
+        function selectWeaponForCrafting(weapon) {
+            if (currentCraftingSlot === null) return;
+            
+            const slot = document.querySelectorAll('.crafting-slot')[currentCraftingSlot];
+            const clearBtn = document.querySelectorAll('.clear-slot-btn')[currentCraftingSlot];
+            gameState.craftingSlots[currentCraftingSlot] = weapon;
+            
+            slot.className = 'crafting-slot weapon selected';
+                            const starDisplay = '⭐'.repeat(weapon.stars || 0);
+                const stars = weapon.stars || 0;
+                slot.innerHTML = `
+                    <div>
+                        <div style="font-weight: bold;">${weapon.name}</div>
+                        <div style="color: #ff6b6b;">${weapon.damage} damage</div>
+                        <div style="color: #ffd700; font-size: 0.9rem; font-weight: bold;">${starDisplay} (${stars}★)</div>
+                        <div style="color: #666; font-size: 0.8rem;">${weapon.rarity}</div>
+                    </div>
+                `;
+            
+            // Show clear button
+            clearBtn.style.display = 'block';
+            
+            closeWeaponSelector();
+        }
+
+        function clearCraftingSlot(slotIndex) {
+            const slot = document.querySelectorAll('.crafting-slot')[slotIndex];
+            const clearBtn = document.querySelectorAll('.clear-slot-btn')[slotIndex];
+            
+            gameState.craftingSlots[slotIndex] = null;
+            slot.className = 'crafting-slot';
+            slot.innerHTML = `Slot ${slotIndex + 1}`;
+            clearBtn.style.display = 'none';
+        }
+
+        function mergeWeapons() {
+            const slot1 = gameState.craftingSlots[0];
+            const slot2 = gameState.craftingSlots[1];
+            
+            if (!slot1 || !slot2) {
+                alert('Please select two weapons to merge!');
+                return;
+            }
+            
+            if (slot1.name !== slot2.name) {
+                alert('You can only merge weapons of the same type!');
+                return;
+            }
+            
+            // Check if weapons have the same star count
+            const stars1 = slot1.stars || 0;
+            const stars2 = slot2.stars || 0;
+            
+            if (stars1 !== stars2) {
+                alert(`You can only merge weapons with the same star count!\nSlot 1: ${stars1}⭐\nSlot 2: ${stars2}⭐`);
+                return;
+            }
+            
+            // Check if weapons are already at max stars (5)
+            if (stars1 >= 5) {
+                alert(`Weapons are already at maximum star level (5★)! Cannot merge further.`);
+                return;
+            }
+            
+            // Find weapons in inventory
+            const weapon1Index = gameState.weapons.findIndex(w => w.id === slot1.id);
+            const weapon2Index = gameState.weapons.findIndex(w => w.id === slot2.id);
+            
+            if (weapon1Index === -1 || weapon2Index === -1) {
+                alert('Weapons not found in inventory!');
+                return;
+            }
+            
+            // Remove weapons from inventory
+            gameState.weapons.splice(Math.max(weapon1Index, weapon2Index), 1);
+            gameState.weapons.splice(Math.min(weapon1Index, weapon2Index), 1);
+            
+            // Create merged weapon
+            const newStarCount = Math.min((slot1.stars || 0) + 1, 5); // Cap at 5 stars
+            const mergedWeapon = {
+                ...slot1,
+                id: Date.now() + Math.random(),
+                damage: Math.floor(slot1.damage * 1.5),
+                stars: newStarCount
+            };
+            
+            gameState.weapons.push(mergedWeapon);
+            
+            // Reset crafting slots
+            gameState.craftingSlots = [null, null];
+            document.querySelectorAll('.crafting-slot').forEach((slot, index) => {
+                slot.className = 'crafting-slot';
+                slot.innerHTML = `Slot ${index + 1}`;
+            });
+            
+            // Hide clear buttons
+            document.querySelectorAll('.clear-slot-btn').forEach(btn => {
+                btn.style.display = 'none';
+            });
+            
+            renderWeapons();
+            saveGameState();
+            
+            const starDisplay = '⭐'.repeat(mergedWeapon.stars);
+            alert(`Weapons merged! New ${mergedWeapon.name} has ${mergedWeapon.damage} damage (1.5x increase) and ${starDisplay}`);
+        }
+
+        // Profile system
+        function updateProfile() {
+            const avatarElement = document.getElementById('profile-avatar');
+            
+            // Apply avatar style
+            const avatarStyle = gameState.profileSettings.avatarStyle;
+            avatarElement.className = `profile-avatar ${avatarStyle}`;
+            
+            // Check if user has uploaded an avatar
+            if (gameState.profileImage) {
+                avatarElement.innerHTML = `
+                    <img src="${gameState.profileImage}" alt="Profile Picture">
+                    <div class="upload-overlay">Click to change</div>
+                `;
+            } else {
+                avatarElement.innerHTML = `
+                    <div>${gameState.level}</div>
+                    <div class="upload-overlay">Click to upload</div>
+                `;
+            }
+            
+            // Update username display
+            document.getElementById('profile-name').textContent = gameState.username;
+            
+            // Update stats if enabled
+            const showStats = gameState.profileSettings.showStats;
+            const statsContainer = document.querySelector('.profile-stats');
+            if (statsContainer) {
+                statsContainer.style.display = showStats ? 'grid' : 'none';
+            }
+            
+            document.getElementById('profile-level').textContent = gameState.level;
+            document.getElementById('profile-xp').textContent = gameState.xp;
+            document.getElementById('profile-coins').textContent = gameState.coins;
+            document.getElementById('profile-tasks').textContent = gameState.tasks.filter(t => t.completed).length;
+            
+            // Best weapon
+            const bestWeapon = gameState.weapons.reduce((best, current) => 
+                current.damage > best.damage ? current : best, { damage: 0 });
+            
+            if (bestWeapon.damage > 0) {
+                document.getElementById('best-weapon-info').innerHTML = `
+                    <div style="font-weight: bold;">${bestWeapon.name}</div>
+                    <div style="color: #ff6b6b;">${bestWeapon.damage} damage</div>
+                    <div style="color: #666; font-size: 0.9rem;">${bestWeapon.rarity}</div>
+                `;
+            } else {
+                document.getElementById('best-weapon-info').textContent = 'No weapons yet';
+            }
+            
+            // Monsters defeated
+            const monstersDefeatedElement = document.getElementById('monsters-defeated');
+            monstersDefeatedElement.innerHTML = '';
+            
+            const monsterCounts = {};
+            gameState.monstersDefeated.forEach(monster => {
+                monsterCounts[monster] = (monsterCounts[monster] || 0) + 1;
+            });
+            
+            Object.entries(monsterCounts).forEach(([monster, count]) => {
+                const badge = document.createElement('div');
+                badge.className = 'monster-badge';
+                badge.textContent = `${monster} (${count})`;
+                monstersDefeatedElement.appendChild(badge);
+            });
+        }
+
+        // Toggle profile editor
+        function toggleProfileEditor() {
+            const editor = document.getElementById('profile-editor');
+            const isVisible = editor.style.display !== 'none';
+            
+            if (!isVisible) {
+                // Load current settings into form
+                document.getElementById('username-input').value = gameState.username;
+                document.getElementById('theme-select').value = gameState.profileSettings.theme;
+                document.getElementById('show-stats').checked = gameState.profileSettings.showStats;
+                document.getElementById('notifications').checked = gameState.profileSettings.notifications;
+                
+                // Load current avatar into edit preview
+                updateEditAvatarPreview();
+                
+                // Update avatar style selection with unlock status
+                updateAvatarStyleSelection(gameState.profileSettings.avatarStyle);
+            }
+            
+            editor.style.display = isVisible ? 'none' : 'block';
+        }
+
+        // Update avatar preview in editor
+        function updateEditAvatarPreview() {
+            const editPreview = document.getElementById('edit-avatar-preview');
+            const avatarStyle = gameState.profileSettings.avatarStyle;
+            
+            // Apply avatar style
+            editPreview.className = `profile-avatar ${avatarStyle}`;
+            
+            if (gameState.profileImage) {
+                editPreview.innerHTML = `<img src="${gameState.profileImage}" alt="Profile Picture">`;
+            } else {
+                editPreview.innerHTML = `<div>${gameState.level}</div>`;
+            }
+        }
+
+        // Remove avatar from editor
+        function removeAvatarFromEditor() {
+            gameState.profileImage = null;
+            updateEditAvatarPreview();
+            updateProfile();
+        }
+
+        // Save profile settings
+        function saveProfile(event) {
+            event.preventDefault();
+            
+            // Get form values
+            const username = document.getElementById('username-input').value.trim();
+            const theme = document.getElementById('theme-select').value;
+            const showStats = document.getElementById('show-stats').checked;
+            const notifications = document.getElementById('notifications').checked;
+            
+            // Validate username
+            if (username.length < 2) {
+                alert('Username must be at least 2 characters long!');
+                return;
+            }
+            
+            if (username.length > 20) {
+                alert('Username must be 20 characters or less!');
+                return;
+            }
+            
+            // Update game state
+            gameState.username = username;
+            gameState.profileSettings.theme = theme;
+            gameState.profileSettings.showStats = showStats;
+            gameState.profileSettings.notifications = notifications;
+            
+            // Save to localStorage
+            saveGameState();
+            
+            // Update profile display
+            updateProfile();
+            
+            // Hide editor
+            document.getElementById('profile-editor').style.display = 'none';
+            
+            // Show success message
+            alert('Profile updated successfully!');
+        }
+
+        // Avatar upload functionality
+        function uploadAvatar(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    gameState.profileImage = e.target.result;
+                    updateProfile();
+                    updateEditAvatarPreview();
+                    saveGameState();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removeAvatar() {
+            gameState.profileImage = null;
+            updateProfile();
+            saveGameState();
+        }
+
+        // Update potential rewards for in-progress tasks
+        function updatePotentialRewards() {
+            const taskList = document.getElementById('task-list');
+            if (!taskList) return;
+            
+            const taskElements = taskList.querySelectorAll('.task-item');
+            taskElements.forEach((taskElement, index) => {
+                const task = gameState.tasks[index];
+                if (task && !task.completed) {
+                    const currentTime = Date.now();
+                    const timeSpent = (currentTime - task.startTime) / (1000 * 60);
+                    const potentialCoins = calculateCoinReward(timeSpent);
+                    const potentialXP = calculateXPReward(timeSpent);
+                    
+                    const timeElement = taskElement.querySelector('.task-time');
+                    const rewardsElement = taskElement.querySelector('.task-rewards');
+                    
+                    if (timeElement && rewardsElement) {
+                        timeElement.textContent = `In progress... (${timeSpent.toFixed(1)} minutes)`;
+                        rewardsElement.innerHTML = `Potential rewards: +${potentialCoins} coins, +${potentialXP} XP`;
+                    }
+                }
+            });
+        }
+
+        // Start automatic monster spawning
+        function startAutoMonsterSpawning() {
+            // Spawn initial monster immediately
+            spawnMonster();
+            
+            // Check for new monster spawn every 10 seconds
+            setInterval(checkMonsterSpawn, 10000);
+        }
+
+        // Manual monster spawn function
+        function forceSpawnMonster() {
+            if (!gameState.currentMonster) {
+                spawnMonster();
+                gameState.lastMonsterSpawn = Date.now();
+                updateMonsterDisplay();
+            } else {
+                alert('A monster is already spawned! Defeat it first.');
+            }
+        }
+
+        // Check if a new monster should spawn
+        function checkMonsterSpawn() {
+            const currentTime = Date.now();
+            const timeSinceLastSpawn = currentTime - gameState.lastMonsterSpawn;
+            
+            // Spawn new monster if none exists or after a delay
+            if (!gameState.currentMonster) {
+                const spawnDelay = Math.max(5000, 30000 - (gameState.monsterDifficulty * 500)); // Faster spawning as difficulty increases
+                if (timeSinceLastSpawn >= spawnDelay) {
+                    spawnMonster();
+                    gameState.lastMonsterSpawn = currentTime;
+                }
+            }
+        }
+
+        // Generate monster with difficulty scaling
+        function generateMonster() {
+            const difficulty = gameState.monsterDifficulty;
+            const level = gameState.level;
+            
+            // Choose monster type based on difficulty and level
+            let monsterIndex;
+            if (difficulty < 5 || level < 3) {
+                monsterIndex = 0; // Goblin for beginners
+            } else if (difficulty < 15 || level < 5) {
+                monsterIndex = 1; // Orc
+            } else if (difficulty < 30 || level < 8) {
+                monsterIndex = 2; // Troll
+            } else if (difficulty < 50 || level < 12) {
+                monsterIndex = 3; // Dragon
+            } else {
+                monsterIndex = 4; // Demon Lord
+            }
+            
+            const baseMonster = baseMonsters[monsterIndex];
+            
+            // Calculate scaling factors - HP doubles each difficulty level
+            const hpMultiplier = Math.pow(2, difficulty) * (1 + level * 0.05);
+            const damageMultiplier = 1 + (difficulty * 0.08) + (level * 0.03);
+            const rewardMultiplier = 1 + (difficulty * 0.15) + (level * 0.08);
+            
+            // Generate scaled monster
+            const monster = {
+                name: baseMonster.name,
+                hp: Math.floor(baseMonster.baseHp * hpMultiplier),
+                damage: Math.floor(baseMonster.baseDamage * damageMultiplier),
+                xpCost: Math.floor(baseMonster.baseXpCost * (1 + difficulty * 0.05)),
+                coinReward: Math.floor(baseMonster.baseCoinReward * rewardMultiplier),
+                difficulty: difficulty,
+                level: level
+            };
+            
+            return monster;
+        }
+
+        // Check for new avatar style unlocks
+        function checkAvatarStyleUnlocks() {
+            const newlyUnlocked = [];
+            
+            Object.entries(avatarStyleRequirements).forEach(([style, requiredLevel]) => {
+                if (gameState.level === requiredLevel) {
+                    newlyUnlocked.push(style);
+                }
+            });
+            
+            if (newlyUnlocked.length > 0) {
+                const styleNames = newlyUnlocked.map(style => style.charAt(0).toUpperCase() + style.slice(1)).join(', ');
+                alert(`🎉 New avatar style${newlyUnlocked.length > 1 ? 's' : ''} unlocked: ${styleNames}! Check your profile editor to try them out!`);
+            }
+        }
+
+        // Initialize game when page loads
+        window.addEventListener('load', initGame);
+    </script>
+</body>
+</html> 
