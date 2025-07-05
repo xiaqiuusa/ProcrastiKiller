@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weapon Star System Demo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 2rem;
+        }
+
+        .features {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .features h3 {
+            margin-top: 0;
+            color: #ff6b6b;
+        }
+
+        .features ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+
+        .features li {
+            margin: 0.5rem 0;
+        }
+
+        .weapon-inventory {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .weapon-card {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+
+        .weapon-card.common {
+            border-color: #6c757d;
+        }
+
+        .weapon-card.rare {
+            border-color: #007bff;
+        }
+
+        .weapon-card.epic {
+            border-color: #6f42c1;
+        }
+
+        .weapon-card.legendary {
+            border-color: #fd7e14;
+        }
+
+        .weapon-name {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .weapon-damage {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
+        .weapon-stars {
+            color: #ffd700;
+            font-size: 0.9rem;
+            margin: 0.25rem 0;
+        }
+
+        .weapon-rarity {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        .demo-controls {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+            margin: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .star-explanation {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .star-explanation h4 {
+            color: #856404;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⭐ Weapon Star System Demo</h1>
+        
+        <div class="features">
+            <h3>✨ Enhanced Star Display Features:</h3>
+            <ul>
+                <li><strong>Visual Stars:</strong> ⭐ emojis show star count</li>
+                <li><strong>Numerical Count:</strong> (X★) shows exact number</li>
+                <li><strong>Clear Progression:</strong> Easy to see weapon evolution</li>
+                <li><strong>Consistent Display:</strong> Stars shown everywhere weapons appear</li>
+                <li><strong>Merging Logic:</strong> Only merge weapons with same star count</li>
+            </ul>
+        </div>
+
+        <div class="star-explanation">
+            <h4>🎯 How Star System Works:</h4>
+            <p><strong>New Weapons:</strong> Start with 0 stars (0★)</p>
+            <p><strong>First Merge:</strong> 0★ + 0★ = 1★ weapon</p>
+            <p><strong>Second Merge:</strong> 1★ + 1★ = 2★ weapon</p>
+            <p><strong>Third Merge:</strong> 2★ + 2★ = 3★ weapon</p>
+            <p><strong>Fourth Merge:</strong> 3★ + 3★ = 4★ weapon</p>
+            <p><strong>Fifth Merge:</strong> 4★ + 4★ = 5★ weapon (MAX)</p>
+            <p><strong>Each Merge:</strong> Increases damage by 1.5x and adds 1 star (Max: 5 stars)</p>
+        </div>
+
+        <div class="demo-controls">
+            <button onclick="addSampleWeapons()" class="btn">Add Sample Weapons</button>
+            <button onclick="mergeRandomWeapons()" class="btn">Merge Random Weapons</button>
+            <button onclick="clearWeapons()" class="btn">Clear All Weapons</button>
+        </div>
+
+        <h3>Your Weapons</h3>
+        <div id="weapon-inventory" class="weapon-inventory">
+            <div class="weapon-card">
+                <div class="weapon-name">No weapons yet</div>
+                <div class="weapon-damage">Add some weapons to see the star system!</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let weapons = [];
+
+        // Sample weapon definitions
+        const sampleWeapons = [
+            { name: "Wooden Sword", damage: 10, rarity: "common" },
+            { name: "Iron Sword", damage: 20, rarity: "common" },
+            { name: "Steel Sword", damage: 35, rarity: "rare" },
+            { name: "Magic Staff", damage: 50, rarity: "epic" },
+            { name: "Dragon Blade", damage: 100, rarity: "legendary" }
+        ];
+
+        function addSampleWeapons() {
+            // Add multiple copies of each weapon with different star levels
+            sampleWeapons.forEach((weapon, index) => {
+                // Add base weapon (0 stars)
+                weapons.push({
+                    ...weapon,
+                    id: Date.now() + Math.random() + index * 3,
+                    stars: 0
+                });
+                
+                // Add 1-star version
+                weapons.push({
+                    ...weapon,
+                    id: Date.now() + Math.random() + index * 3 + 1,
+                    damage: Math.floor(weapon.damage * 1.5),
+                    stars: 1
+                });
+                
+                // Add 2-star version
+                weapons.push({
+                    ...weapon,
+                    id: Date.now() + Math.random() + index * 3 + 2,
+                    damage: Math.floor(weapon.damage * 1.5 * 1.5),
+                    stars: 2
+                });
+                
+                // Add 3-star version
+                weapons.push({
+                    ...weapon,
+                    id: Date.now() + Math.random() + index * 3 + 3,
+                    damage: Math.floor(weapon.damage * 1.5 * 1.5 * 1.5),
+                    stars: 3
+                });
+                
+                // Add 4-star version
+                weapons.push({
+                    ...weapon,
+                    id: Date.now() + Math.random() + index * 3 + 4,
+                    damage: Math.floor(weapon.damage * 1.5 * 1.5 * 1.5 * 1.5),
+                    stars: 4
+                });
+                
+                // Add 5-star version (MAX)
+                weapons.push({
+                    ...weapon,
+                    id: Date.now() + Math.random() + index * 3 + 5,
+                    damage: Math.floor(weapon.damage * 1.5 * 1.5 * 1.5 * 1.5 * 1.5),
+                    stars: 5
+                });
+            });
+            
+            renderWeapons();
+            alert('Sample weapons added! You can see different star levels (0★, 1★, 2★)');
+        }
+
+        function mergeRandomWeapons() {
+            if (weapons.length < 2) {
+                alert('Need at least 2 weapons to merge!');
+                return;
+            }
+            
+            // Find weapons with same name and star count
+            const weaponGroups = {};
+            weapons.forEach(weapon => {
+                const key = `${weapon.name}_${weapon.stars}`;
+                if (!weaponGroups[key]) {
+                    weaponGroups[key] = [];
+                }
+                weaponGroups[key].push(weapon);
+            });
+            
+            // Find a group with at least 2 weapons
+            let mergeableGroup = null;
+            for (const [key, group] of Object.entries(weaponGroups)) {
+                if (group.length >= 2) {
+                    mergeableGroup = group;
+                    break;
+                }
+            }
+            
+            if (!mergeableGroup) {
+                alert('No weapons available for merging! Need 2 of the same type and star count.');
+                return;
+            }
+            
+            // Check if weapons are already at max stars (5)
+            if (mergeableGroup[0].stars >= 5) {
+                alert(`Weapons are already at maximum star level (5★)! Cannot merge further.`);
+                return;
+            }
+            
+            // Merge the first two weapons in the group
+            const weapon1 = mergeableGroup[0];
+            const weapon2 = mergeableGroup[1];
+            
+            // Remove weapons from inventory
+            weapons = weapons.filter(w => w.id !== weapon1.id && w.id !== weapon2.id);
+            
+            // Create merged weapon (cap at 5 stars)
+            const newStarCount = Math.min(weapon1.stars + 1, 5);
+            const mergedWeapon = {
+                ...weapon1,
+                id: Date.now() + Math.random(),
+                damage: Math.floor(weapon1.damage * 1.5),
+                stars: newStarCount
+            };
+            
+            weapons.push(mergedWeapon);
+            renderWeapons();
+            
+            const starDisplay = '⭐'.repeat(mergedWeapon.stars);
+            alert(`Weapons merged!\n${weapon1.name} (${weapon1.stars}★) + ${weapon2.name} (${weapon2.stars}★) = ${mergedWeapon.name} (${mergedWeapon.stars}★)\nNew damage: ${mergedWeapon.damage} (1.5x increase)`);
+        }
+
+        function clearWeapons() {
+            weapons = [];
+            renderWeapons();
+            alert('All weapons cleared!');
+        }
+
+        function renderWeapons() {
+            const inventory = document.getElementById('weapon-inventory');
+            inventory.innerHTML = '';
+            
+            if (weapons.length === 0) {
+                inventory.innerHTML = `
+                    <div class="weapon-card">
+                        <div class="weapon-name">No weapons yet</div>
+                        <div class="weapon-damage">Add some weapons to see the star system!</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            weapons.forEach(weapon => {
+                const weaponElement = document.createElement('div');
+                weaponElement.className = `weapon-card ${weapon.rarity}`;
+                
+                // Create star display
+                const stars = weapon.stars || 0;
+                const starDisplay = '⭐'.repeat(stars);
+                
+                weaponElement.innerHTML = `
+                    <div class="weapon-name">${weapon.name}</div>
+                    <div class="weapon-damage">${weapon.damage} damage</div>
+                    <div class="weapon-stars">${starDisplay} <span style="color: #ffd700; font-weight: bold;">(${stars}★)</span></div>
+                    <div class="weapon-rarity">${weapon.rarity}</div>
+                `;
+                inventory.appendChild(weaponElement);
+            });
+        }
+
+        // Initialize
+        renderWeapons();
+    </script>
+</body>
+</html> 

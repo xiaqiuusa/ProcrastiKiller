@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Center - ProcrastiKiller</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            color: #ff6b6b;
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #ff6b6b;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 120px 0 80px;
+        }
+
+        .hero-section {
+            text-align: center;
+            color: white;
+            margin-bottom: 4rem;
+        }
+
+        .hero-section h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-section p {
+            font-size: 1.3rem;
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+
+        .search-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .search-box {
+            display: flex;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 8px 0 0 8px;
+            font-size: 1rem;
+        }
+
+        .search-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 1rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .help-content {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 3rem;
+        }
+
+        .sidebar {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .sidebar h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar a {
+            color: #666;
+            text-decoration: none;
+            padding: 0.5rem 0;
+            display: block;
+            transition: color 0.3s ease;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            color: #ff6b6b;
+        }
+
+        .content-area {
+            background: white;
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .help-section {
+            margin-bottom: 3rem;
+        }
+
+        .help-section h2 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+
+        .help-section h3 {
+            color: #ff6b6b;
+            margin: 2rem 0 1rem;
+            font-size: 1.5rem;
+        }
+
+        .help-section p {
+            margin-bottom: 1rem;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .help-section ul {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        .help-section li {
+            margin-bottom: 0.5rem;
+            color: #666;
+        }
+
+        .step-guide {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .step-guide h4 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .step-guide ol {
+            padding-left: 1.5rem;
+        }
+
+        .step-guide li {
+            margin-bottom: 0.5rem;
+            color: #666;
+        }
+
+        .tip-box {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .tip-box h4 {
+            color: #0066cc;
+            margin-bottom: 0.5rem;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .warning-box h4 {
+            color: #856404;
+            margin-bottom: 0.5rem;
+        }
+
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        .video-tutorial {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+
+        .video-placeholder {
+            background: #ddd;
+            height: 200px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .contact-support {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .contact-support h3 {
+            margin-bottom: 1rem;
+        }
+
+        .contact-btn {
+            display: inline-block;
+            background: white;
+            color: #ff6b6b;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-top: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .contact-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        footer {
+            background: #333;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            color: #ff6b6b;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: #ccc;
+            text-decoration: none;
+        }
+
+        .footer-section a:hover {
+            color: #ff6b6b;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #555;
+            padding-top: 2rem;
+            color: #ccc;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-section h2 {
+                font-size: 2rem;
+            }
+
+            .help-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .content-area {
+                padding: 2rem;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .search-input {
+                border-radius: 8px 8px 0 0;
+            }
+
+            .search-btn {
+                border-radius: 0 0 8px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <h1>ProcrastiKiller</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="app.html">Play Now</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Hero Section -->
+            <section class="hero-section">
+                <h2>Help Center</h2>
+                <p>Find answers to your questions and learn how to master ProcrastiKiller</p>
+            </section>
+
+            <!-- Search Section -->
+            <section class="search-section">
+                <h3>Search for help</h3>
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Search for help topics...">
+                    <button class="search-btn">Search</button>
+                </div>
+            </section>
+
+            <!-- Help Content -->
+            <div class="help-content">
+                <!-- Sidebar -->
+                <div class="sidebar">
+                    <h3>Quick Navigation</h3>
+                    <ul>
+                        <li><a href="#getting-started" class="active">Getting Started</a></li>
+                        <li><a href="#task-management">Task Management</a></li>
+                        <li><a href="#gacha-system">Gacha System</a></li>
+                        <li><a href="#battle-system">Battle System</a></li>
+                        <li><a href="#crafting">Crafting</a></li>
+                        <li><a href="#profile">Profile & Stats</a></li>
+                        <li><a href="#troubleshooting">Troubleshooting</a></li>
+                        <li><a href="#advanced-tips">Advanced Tips</a></li>
+                    </ul>
+                </div>
+
+                <!-- Content Area -->
+                <div class="content-area">
+                    <!-- Getting Started -->
+                    <div id="getting-started" class="help-section">
+                        <h2>Getting Started</h2>
+                        <p>Welcome to ProcrastiKiller! This guide will help you understand the basics and start your productivity journey.</p>
+                        
+                        <div class="step-guide">
+                            <h4>First Steps</h4>
+                            <ol>
+                                <li>Create your first task in the Tasks tab</li>
+                                <li>Complete tasks to earn coins and XP</li>
+                                <li>Use coins to pull weapons from the gacha</li>
+                                <li>Battle monsters to earn more rewards</li>
+                                <li>Merge weapons to increase their power</li>
+                            </ol>
+                        </div>
+
+                        <div class="tip-box">
+                            <h4>💡 Pro Tip</h4>
+                            <p>Take your time with tasks! The longer you spend on a task (up to 60 minutes), the more coins and XP you'll earn.</p>
+                        </div>
+                    </div>
+
+                    <!-- Task Management -->
+                    <div id="task-management" class="help-section">
+                        <h2>Task Management</h2>
+                        <p>Learn how to create, manage, and complete tasks effectively.</p>
+
+                        <h3>Creating Tasks</h3>
+                        <p>To create a new task:</p>
+                        <ul>
+                            <li>Go to the Tasks tab</li>
+                            <li>Enter your task description in the input field</li>
+                            <li>Click "Add Task" to create the task</li>
+                        </ul>
+
+                        <h3>Completing Tasks</h3>
+                        <p>When you're ready to complete a task:</p>
+                        <ul>
+                            <li>Click the "Complete" button next to your task</li>
+                            <li>The system will calculate your rewards based on time spent</li>
+                            <li>You'll see your earned coins and XP displayed</li>
+                        </ul>
+
+                        <h3>Reward System</h3>
+                        <p>Task rewards are calculated based on time spent:</p>
+                        <div class="code-block">
+                            <strong>Coins:</strong><br>
+                            • 0-5 minutes: 0 coins<br>
+                            • 5-10 minutes: 5 coins<br>
+                            • 10-15 minutes: 10 coins<br>
+                            • ... and so on up to 60 coins max<br><br>
+                            <strong>XP:</strong><br>
+                            • 0-5 minutes: 10 XP<br>
+                            • 5-10 minutes: 20 XP<br>
+                            • 10-15 minutes: 30 XP<br>
+                            • ... and so on up to 120 XP max
+                        </div>
+
+                        <div class="warning-box">
+                            <h4>⚠️ Important</h4>
+                            <p>Don't rush through tasks! The system is designed to reward thoughtful, time-intensive work rather than quick completions.</p>
+                        </div>
+                    </div>
+
+                    <!-- Gacha System -->
+                    <div id="gacha-system" class="help-section">
+                        <h2>Gacha System</h2>
+                        <p>Learn about the weapon gacha system and how to build your arsenal.</p>
+
+                        <h3>Pulling Weapons</h3>
+                        <ul>
+                            <li>Each weapon pull costs 100 coins</li>
+                            <li>Weapons have different rarities: Common, Rare, Epic, and Legendary</li>
+                            <li>Higher rarity weapons have more damage</li>
+                        </ul>
+
+                        <h3>Weapon Rarities</h3>
+                        <div class="code-block">
+                            <strong>Common:</strong> Wooden Sword (10 damage), Iron Sword (20 damage)<br>
+                            <strong>Rare:</strong> Steel Sword (35 damage)<br>
+                            <strong>Epic:</strong> Magic Staff (50 damage)<br>
+                            <strong>Legendary:</strong> Dragon Blade (100 damage)
+                        </div>
+
+                        <h3>Drop Rates</h3>
+                        <ul>
+                            <li>Common: 80% chance</li>
+                            <li>Rare: 15% chance</li>
+                            <li>Epic: 4% chance</li>
+                            <li>Legendary: 1% chance</li>
+                        </ul>
+
+                        <div class="tip-box">
+                            <h4>💡 Strategy Tip</h4>
+                            <p>Save up your coins and pull multiple weapons at once. You might get lucky with a rare or epic weapon!</p>
+                        </div>
+                    </div>
+
+                    <!-- Battle System -->
+                    <div id="battle-system" class="help-section">
+                        <h2>Battle System</h2>
+                        <p>Master the art of monster hunting and earn rewards.</p>
+
+                        <h3>Monster Spawning</h3>
+                        <p>Monsters automatically spawn in the battle arena. Each monster has different stats and rewards.</p>
+
+                        <h3>Monster Types</h3>
+                        <div class="code-block">
+                            <strong>Goblin:</strong> 50 HP, 10 damage, 5 XP cost, 20 coin reward<br>
+                            <strong>Orc:</strong> 100 HP, 20 damage, 10 XP cost, 40 coin reward<br>
+                            <strong>Troll:</strong> 200 HP, 35 damage, 20 XP cost, 80 coin reward<br>
+                            <strong>Dragon:</strong> 500 HP, 80 damage, 50 XP cost, 200 coin reward<br>
+                            <strong>Demon Lord:</strong> 1000 HP, 150 damage, 100 XP cost, 500 coin reward
+                        </div>
+
+                        <h3>Attacking Monsters</h3>
+                        <ul>
+                            <li>Select a weapon from the dropdown menu</li>
+                            <li>Click "Attack" to deal damage</li>
+                            <li>Each attack costs XP based on the monster</li>
+                            <li>Defeat the monster to earn coins</li>
+                        </ul>
+
+                        <div class="tip-box">
+                            <h4>⚔️ Combat Tip</h4>
+                            <p>Use your strongest weapons against tougher monsters. The damage you deal is equal to your weapon's damage stat.</p>
+                        </div>
+                    </div>
+
+                    <!-- Crafting -->
+                    <div id="crafting" class="help-section">
+                        <h2>Crafting System</h2>
+                        <p>Learn how to merge weapons and increase their power.</p>
+
+                        <h3>Weapon Merging</h3>
+                        <div class="step-guide">
+                            <h4>How to Merge Weapons</h4>
+                            <ol>
+                                <li>Go to the Crafting tab</li>
+                                <li>Click on Slot 1 and select a weapon</li>
+                                <li>Click on Slot 2 and select the same weapon type</li>
+                                <li>Click "Merge Weapons" to combine them</li>
+                                <li>The new weapon will have increased damage</li>
+                            </ol>
+                        </div>
+
+                        <h3>Damage Increase</h3>
+                        <p>When you merge two weapons:</p>
+                        <ul>
+                            <li>The damage increases by 0.5% of the original weapon's damage</li>
+                            <li>Minimum increase is 1 damage point</li>
+                            <li>You can merge the same weapon type multiple times</li>
+                        </ul>
+
+                        <div class="warning-box">
+                            <h4>⚠️ Important</h4>
+                            <p>You can only merge weapons of the same type. For example, you can merge two Wooden Swords, but not a Wooden Sword with an Iron Sword.</p>
+                        </div>
+                    </div>
+
+                    <!-- Profile -->
+                    <div id="profile" class="help-section">
+                        <h2>Profile & Statistics</h2>
+                        <p>Track your progress and view your achievements.</p>
+
+                        <h3>Profile Information</h3>
+                        <ul>
+                            <li><strong>Level:</strong> Increases based on total XP earned</li>
+                            <li><strong>Total XP:</strong> All XP earned from tasks and battles</li>
+                            <li><strong>Total Coins:</strong> All coins earned throughout your journey</li>
+                            <li><strong>Tasks Completed:</strong> Number of tasks you've finished</li>
+                        </ul>
+
+                        <h3>Best Weapon</h3>
+                        <p>Your profile shows your highest damage weapon, including its name, damage, and rarity.</p>
+
+                        <h3>Monsters Defeated</h3>
+                        <p>Track how many of each monster type you've defeated. This helps you see your progress and favorite hunting targets.</p>
+
+                        <div class="tip-box">
+                            <h4>📊 Progress Tracking</h4>
+                            <p>Check your profile regularly to see your growth and set new goals for yourself!</p>
+                        </div>
+                    </div>
+
+                    <!-- Troubleshooting -->
+                    <div id="troubleshooting" class="help-section">
+                        <h2>Troubleshooting</h2>
+                        <p>Common issues and their solutions.</p>
+
+                        <h3>Progress Not Saving</h3>
+                        <p><strong>Problem:</strong> Your progress disappears when you refresh the page.</p>
+                        <p><strong>Solution:</strong> Make sure you're not using incognito/private browsing mode, and check that localStorage is enabled in your browser.</p>
+
+                        <h3>Can't Complete Tasks</h3>
+                        <p><strong>Problem:</strong> The complete button doesn't work.</p>
+                        <p><strong>Solution:</strong> Try refreshing the page. If the problem persists, clear your browser cache and try again.</p>
+
+                        <h3>Weapons Not Appearing</h3>
+                        <p><strong>Problem:</strong> Pulled weapons don't show up in inventory.</p>
+                        <p><strong>Solution:</strong> Check if you have enough coins (100 per pull). If you do, try refreshing the page.</p>
+
+                        <h3>Monsters Not Spawning</h3>
+                        <p><strong>Problem:</strong> No monsters appear in the battle arena.</p>
+                        <p><strong>Solution:</strong> Monsters spawn automatically. If none appear, wait a few minutes or refresh the page.</p>
+
+                        <div class="warning-box">
+                            <h4>🔧 Technical Support</h4>
+                            <p>If you continue experiencing issues, please contact our support team with details about your browser and the specific problem you're encountering.</p>
+                        </div>
+                    </div>
+
+                    <!-- Advanced Tips -->
+                    <div id="advanced-tips" class="help-section">
+                        <h2>Advanced Tips & Strategies</h2>
+                        <p>Master the game with these advanced strategies.</p>
+
+                        <h3>Optimal Task Timing</h3>
+                        <p>For maximum efficiency:</p>
+                        <ul>
+                            <li>Spend 60 minutes on important tasks for maximum rewards</li>
+                            <li>Use shorter tasks (5-15 minutes) for quick XP gains</li>
+                            <li>Balance task duration with your available time</li>
+                        </ul>
+
+                        <h3>Weapon Strategy</h3>
+                        <p>Smart weapon management:</p>
+                        <ul>
+                            <li>Keep multiple copies of the same weapon for merging</li>
+                            <li>Use weaker weapons on easy monsters to save XP</li>
+                            <li>Save your strongest weapons for tough battles</li>
+                        </ul>
+
+                        <h3>Coin Management</h3>
+                        <p>Efficient coin usage:</p>
+                        <ul>
+                            <li>Save coins for weapon pulls rather than spending immediately</li>
+                            <li>Focus on defeating monsters for steady coin income</li>
+                            <li>Balance between pulling new weapons and saving for emergencies</li>
+                        </ul>
+
+                        <div class="video-tutorial">
+                            <h4>Video Tutorials</h4>
+                            <div class="video-placeholder">
+                                🎥 Advanced Strategies Tutorial<br>
+                                (Coming Soon)
+                            </div>
+                            <p>Watch our video tutorials for visual guides on advanced techniques.</p>
+                        </div>
+                    </div>
+
+                    <!-- Contact Support -->
+                    <div class="contact-support">
+                        <h3>Still Need Help?</h3>
+                        <p>Can't find what you're looking for? Our support team is here to help!</p>
+                        <a href="contact.html" class="contact-btn">Contact Support</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>ProcrastiKiller</h3>
+                    <p>Level up your productivity with the ultimate gamified task management app.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="app.html">Play Now</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Support</h3>
+                    <ul>
+                        <li><a href="help.html">Help Center</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="feedback.html">Feedback</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Legal</h3>
+                    <ul>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="cookies.html">Cookie Policy</a></li>
+                        <li><a href="gdpr.html">GDPR</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 ProcrastiKiller. All rights reserved. Level up your productivity!</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation
+        document.querySelectorAll('.sidebar a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remove active class from all links
+                document.querySelectorAll('.sidebar a').forEach(l => l.classList.remove('active'));
+                
+                // Add active class to clicked link
+                this.classList.add('active');
+                
+                // Scroll to section
+                const targetId = this.getAttribute('href').substring(1);
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    targetSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Search functionality
+        document.querySelector('.search-btn').addEventListener('click', function() {
+            const searchTerm = document.querySelector('.search-input').value.toLowerCase();
+            const sections = document.querySelectorAll('.help-section');
+            
+            sections.forEach(section => {
+                const text = section.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    section.style.display = 'block';
+                    section.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        });
+
+        // Enter key for search
+        document.querySelector('.search-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.querySelector('.search-btn').click();
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - ProcrastiKiller</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            color: #ff6b6b;
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #ff6b6b;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 120px 0 80px;
+        }
+
+        .hero-section {
+            text-align: center;
+            color: white;
+            margin-bottom: 4rem;
+        }
+
+        .hero-section h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-section p {
+            font-size: 1.3rem;
+            max-width: 800px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+
+        .content-section {
+            background: white;
+            border-radius: 15px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: #333;
+            text-align: center;
+        }
+
+        .story-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .story-card {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .story-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .story-card h3 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .story-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .mission-statement {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 3rem;
+            border-radius: 15px;
+            text-align: center;
+            margin: 3rem 0;
+        }
+
+        .mission-statement h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .mission-statement p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .team-section {
+            text-align: center;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .team-member {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .team-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .team-member h4 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .team-member p {
+            color: #666;
+        }
+
+        .cta-section {
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+        }
+
+        /* Footer */
+        footer {
+            background: #333;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            color: #ff6b6b;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: #ccc;
+            text-decoration: none;
+        }
+
+        .footer-section a:hover {
+            color: #ff6b6b;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #555;
+            padding-top: 2rem;
+            color: #ccc;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-section h2 {
+                font-size: 2rem;
+            }
+
+            .content-section {
+                padding: 2rem;
+            }
+
+            .story-grid,
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <h1>ProcrastiKiller</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="app.html">Play Now</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Hero Section -->
+            <section class="hero-section">
+                <h2>Our Story</h2>
+                <p>Born from the frustration of endless procrastination, ProcrastiKiller transforms the mundane into the magnificent.</p>
+            </section>
+
+            <!-- Story Section -->
+            <section class="content-section">
+                <h2 class="section-title">The Birth of ProcrastiKiller</h2>
+                <div class="story-grid">
+                    <div class="story-card">
+                        <div class="story-icon">😴</div>
+                        <h3>The Problem</h3>
+                        <p>In a world where productivity apps promised everything but delivered nothing, millions struggled with procrastination. Traditional methods felt like chores, not solutions.</p>
+                    </div>
+                    <div class="story-card">
+                        <div class="story-icon">💡</div>
+                        <h3>The Epiphany</h3>
+                        <p>What if we could make productivity as addictive as video games? What if completing tasks felt like defeating monsters and earning epic loot?</p>
+                    </div>
+                    <div class="story-card">
+                        <div class="story-icon">⚔️</div>
+                        <h3>The Solution</h3>
+                        <p>ProcrastiKiller was born - a gamified productivity platform that turns every task into an epic quest, every completion into a victory, and every day into an adventure.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Mission Statement -->
+            <section class="mission-statement">
+                <h3>Our Mission</h3>
+                <p>To eliminate procrastination by making productivity the most engaging and rewarding experience possible. We believe that when work feels like play, everyone wins.</p>
+            </section>
+
+            <!-- Values Section -->
+            <section class="content-section">
+                <h2 class="section-title">Our Values</h2>
+                <div class="story-grid">
+                    <div class="story-card">
+                        <div class="story-icon">🎮</div>
+                        <h3>Gamification First</h3>
+                        <p>We believe that the best way to motivate people is through engaging gameplay mechanics that make productivity fun and addictive.</p>
+                    </div>
+                    <div class="story-card">
+                        <div class="story-icon">🚀</div>
+                        <h3>Continuous Innovation</h3>
+                        <p>We're constantly evolving our platform with new features, weapons, monsters, and challenges to keep the experience fresh and exciting.</p>
+                    </div>
+                    <div class="story-card">
+                        <div class="story-icon">👥</div>
+                        <h3>Community Driven</h3>
+                        <p>Our community of productivity warriors inspires us daily. Their feedback and achievements drive our development and keep us motivated.</p>
+                    </div>
+                    <div class="story-card">
+                        <div class="story-icon">🎯</div>
+                        <h3>Results Focused</h3>
+                        <p>While we make productivity fun, we never lose sight of the ultimate goal: helping people achieve more and live better lives.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Team Section -->
+            <section class="content-section">
+                <h2 class="section-title">Meet the Team</h2>
+                <div class="team-section">
+                    <div class="team-grid">
+                        <div class="team-member">
+                            <div class="team-avatar">A</div>
+                            <h4>Alex Chen</h4>
+                            <p>Founder & CEO</p>
+                            <p>A former procrastination victim who turned his struggle into a mission to help others.</p>
+                        </div>
+                        <div class="team-member">
+                            <div class="team-avatar">S</div>
+                            <h4>Sarah Kim</h4>
+                            <p>Lead Developer</p>
+                            <p>Gaming enthusiast who believes code should be as fun to write as games are to play.</p>
+                        </div>
+                        <div class="team-member">
+                            <div class="team-avatar">M</div>
+                            <h4>Mike Rodriguez</h4>
+                            <p>Game Designer</p>
+                            <p>Former AAA game developer who brings years of experience in creating engaging experiences.</p>
+                        </div>
+                        <div class="team-member">
+                            <div class="team-avatar">E</div>
+                            <h4>Emma Thompson</h4>
+                            <p>Product Manager</p>
+                            <p>Productivity expert who ensures every feature serves both fun and function.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CTA Section -->
+            <section class="cta-section">
+                <h3>Ready to Join the Adventure?</h3>
+                <p>Start your productivity journey today and become the hero of your own story!</p>
+                <a href="app.html" class="cta-button">Begin Your Quest</a>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>ProcrastiKiller</h3>
+                    <p>Level up your productivity with the ultimate gamified task management app.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="app.html">Play Now</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Support</h3>
+                    <ul>
+                        <li><a href="help.html">Help Center</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="feedback.html">Feedback</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Legal</h3>
+                    <ul>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="cookies.html">Cookie Policy</a></li>
+                        <li><a href="gdpr.html">GDPR</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 ProcrastiKiller. All rights reserved. Level up your productivity!</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html> 

@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crafting Interface Demo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 2rem;
+        }
+
+        .features {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .features h3 {
+            margin-top: 0;
+            color: #ff6b6b;
+        }
+
+        .features ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+
+        .features li {
+            margin: 0.5rem 0;
+        }
+
+        /* Crafting Styles */
+        .crafting-section {
+            text-align: center;
+        }
+
+        .crafting-slots {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .crafting-slot-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .crafting-slot {
+            width: 150px;
+            height: 150px;
+            border: 3px dashed #ddd;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .crafting-slot:hover {
+            border-color: #ff6b6b;
+        }
+
+        .crafting-slot.selected {
+            border-color: #ff6b6b;
+            background: #fff5f5;
+        }
+
+        .crafting-slot.weapon {
+            border-style: solid;
+            background: white;
+        }
+
+        .clear-slot-btn {
+            background: linear-gradient(45deg, #6c757d, #5a6268);
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .clear-slot-btn:hover {
+            background: linear-gradient(45deg, #5a6268, #495057);
+            transform: translateY(-1px);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .merge-btn {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            margin-top: 1rem;
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.3rem;
+        }
+
+        .close {
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .close:hover {
+            opacity: 0.7;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .weapon-selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .weapon-selection-item {
+            background: #f8f9fa;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .weapon-selection-item:hover {
+            border-color: #ff6b6b;
+            background: #fff5f5;
+            transform: translateY(-2px);
+        }
+
+        .weapon-selection-item.selected {
+            border-color: #ff6b6b;
+            background: #fff5f5;
+        }
+
+        .weapon-selection-item .weapon-name {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .weapon-selection-item .weapon-damage {
+            color: #ff6b6b;
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+
+        .weapon-selection-item .weapon-rarity {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: capitalize;
+        }
+
+        .weapon-selection-item .weapon-count {
+            background: #ff6b6b;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin: 0.5rem auto 0;
+        }
+
+        .demo-weapons {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .demo-weapons h3 {
+            margin-top: 0;
+            color: #ff6b6b;
+        }
+
+        .weapon-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .weapon-item {
+            background: white;
+            padding: 0.5rem;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Crafting Interface Demo</h1>
+        
+        <div class="features">
+            <h3>✨ New Clickable Crafting Features:</h3>
+            <ul>
+                <li><strong>No More Typing:</strong> Click buttons instead of typing weapon names</li>
+                <li><strong>Visual Weapon Selection:</strong> Beautiful modal with weapon cards</li>
+                <li><strong>Weapon Count Display:</strong> See how many of each weapon you have</li>
+                <li><strong>Clear Slot Buttons:</strong> Easily remove weapons from crafting slots</li>
+                <li><strong>Responsive Design:</strong> Works great on all screen sizes</li>
+                <li><strong>Smooth Animations:</strong> Professional modal transitions</li>
+            </ul>
+        </div>
+
+        <div class="demo-weapons">
+            <h3>📦 Sample Weapons (Click "Add Sample Weapons" to populate)</h3>
+            <div id="weapon-list" class="weapon-list">
+                <div class="weapon-item">No weapons yet</div>
+            </div>
+            <button onclick="addSampleWeapons()" class="btn" style="margin-top: 1rem;">Add Sample Weapons</button>
+        </div>
+
+        <div class="crafting-section">
+            <h2>Weapon Crafting</h2>
+            <p>Select two of the same weapon type to merge and increase damage by 1.5x</p>
+            <div class="crafting-slots">
+                <div class="crafting-slot-container">
+                    <div class="crafting-slot" onclick="showWeaponSelector(0)">Slot 1</div>
+                    <button class="clear-slot-btn" onclick="clearCraftingSlot(0)" style="display: none;">Clear</button>
+                </div>
+                <div class="crafting-slot-container">
+                    <div class="crafting-slot" onclick="showWeaponSelector(1)">Slot 2</div>
+                    <button class="clear-slot-btn" onclick="clearCraftingSlot(1)" style="display: none;">Clear</button>
+                </div>
+            </div>
+            <button onclick="mergeWeapons()" class="btn merge-btn">Merge Weapons</button>
+        </div>
+    </div>
+
+    <!-- Weapon Selection Modal -->
+    <div id="weapon-selector-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Select Weapon for Slot <span id="slot-number"></span></h3>
+                <span class="close" onclick="closeWeaponSelector()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="weapon-selection-grid" class="weapon-selection-grid">
+                    <!-- Weapons will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let weapons = [];
+        let craftingSlots = [null, null];
+        let currentCraftingSlot = null;
+
+        // Sample weapon definitions
+        const sampleWeapons = [
+            { name: "Wooden Sword", damage: 10, rarity: "common" },
+            { name: "Iron Sword", damage: 20, rarity: "common" },
+            { name: "Steel Sword", damage: 35, rarity: "rare" },
+            { name: "Magic Staff", damage: 50, rarity: "epic" },
+            { name: "Dragon Blade", damage: 100, rarity: "legendary" }
+        ];
+
+        function addSampleWeapons() {
+            // Add multiple copies of each weapon
+            sampleWeapons.forEach(weapon => {
+                for (let i = 0; i < 3; i++) {
+                    weapons.push({
+                        ...weapon,
+                        id: Date.now() + Math.random() + i
+                    });
+                }
+            });
+            
+            updateWeaponList();
+            alert('Sample weapons added! Click on the crafting slots to see the new interface.');
+        }
+
+        function updateWeaponList() {
+            const weaponList = document.getElementById('weapon-list');
+            
+            if (weapons.length === 0) {
+                weaponList.innerHTML = '<div class="weapon-item">No weapons yet</div>';
+                return;
+            }
+            
+            // Group weapons by name and count them
+            const weaponGroups = {};
+            weapons.forEach(weapon => {
+                if (!weaponGroups[weapon.name]) {
+                    weaponGroups[weapon.name] = {
+                        name: weapon.name,
+                        damage: weapon.damage,
+                        rarity: weapon.rarity,
+                        count: 0
+                    };
+                }
+                weaponGroups[weapon.name].count++;
+            });
+            
+            weaponList.innerHTML = '';
+            Object.values(weaponGroups).forEach(group => {
+                const item = document.createElement('div');
+                item.className = 'weapon-item';
+                item.innerHTML = `${group.name} (${group.damage} dmg) - ${group.count}x`;
+                weaponList.appendChild(item);
+            });
+        }
+
+        function showWeaponSelector(slotIndex) {
+            if (weapons.length === 0) {
+                alert('No weapons available for crafting! Add some sample weapons first.');
+                return;
+            }
+            
+            currentCraftingSlot = slotIndex;
+            document.getElementById('slot-number').textContent = slotIndex + 1;
+            
+            // Group weapons by name and count them
+            const weaponGroups = {};
+            weapons.forEach(weapon => {
+                if (!weaponGroups[weapon.name]) {
+                    weaponGroups[weapon.name] = {
+                        name: weapon.name,
+                        damage: weapon.damage,
+                        rarity: weapon.rarity,
+                        count: 0,
+                        instances: []
+                    };
+                }
+                weaponGroups[weapon.name].count++;
+                weaponGroups[weapon.name].instances.push(weapon);
+            });
+            
+            // Populate weapon selection grid
+            const grid = document.getElementById('weapon-selection-grid');
+            grid.innerHTML = '';
+            
+            Object.values(weaponGroups).forEach(group => {
+                const item = document.createElement('div');
+                item.className = 'weapon-selection-item';
+                item.onclick = () => selectWeaponForCrafting(group.instances[0]);
+                
+                item.innerHTML = `
+                    <div class="weapon-name">${group.name}</div>
+                    <div class="weapon-damage">${group.damage} damage</div>
+                    <div class="weapon-rarity">${group.rarity}</div>
+                    <div class="weapon-count">${group.count}</div>
+                `;
+                
+                grid.appendChild(item);
+            });
+            
+            // Show modal
+            document.getElementById('weapon-selector-modal').style.display = 'block';
+        }
+
+        function closeWeaponSelector() {
+            document.getElementById('weapon-selector-modal').style.display = 'none';
+            currentCraftingSlot = null;
+        }
+
+        function selectWeaponForCrafting(weapon) {
+            if (currentCraftingSlot === null) return;
+            
+            const slot = document.querySelectorAll('.crafting-slot')[currentCraftingSlot];
+            const clearBtn = document.querySelectorAll('.clear-slot-btn')[currentCraftingSlot];
+            craftingSlots[currentCraftingSlot] = weapon;
+            
+            slot.className = 'crafting-slot weapon selected';
+            slot.innerHTML = `
+                <div>
+                    <div style="font-weight: bold;">${weapon.name}</div>
+                    <div style="color: #ff6b6b;">${weapon.damage} damage</div>
+                    <div style="color: #666; font-size: 0.8rem;">${weapon.rarity}</div>
+                </div>
+            `;
+            
+            // Show clear button
+            clearBtn.style.display = 'block';
+            
+            closeWeaponSelector();
+        }
+
+        function clearCraftingSlot(slotIndex) {
+            const slot = document.querySelectorAll('.crafting-slot')[slotIndex];
+            const clearBtn = document.querySelectorAll('.clear-slot-btn')[slotIndex];
+            
+            craftingSlots[slotIndex] = null;
+            slot.className = 'crafting-slot';
+            slot.innerHTML = `Slot ${slotIndex + 1}`;
+            clearBtn.style.display = 'none';
+        }
+
+        function mergeWeapons() {
+            const slot1 = craftingSlots[0];
+            const slot2 = craftingSlots[1];
+            
+            if (!slot1 || !slot2) {
+                alert('Please select two weapons to merge!');
+                return;
+            }
+            
+            if (slot1.name !== slot2.name) {
+                alert('You can only merge weapons of the same type!');
+                return;
+            }
+            
+            // Remove weapons from inventory
+            const weapon1Index = weapons.findIndex(w => w.id === slot1.id);
+            const weapon2Index = weapons.findIndex(w => w.id === slot2.id);
+            
+            if (weapon1Index !== -1 && weapon2Index !== -1) {
+                weapons.splice(Math.max(weapon1Index, weapon2Index), 1);
+                weapons.splice(Math.min(weapon1Index, weapon2Index), 1);
+            }
+            
+            // Create merged weapon
+            const mergedWeapon = {
+                ...slot1,
+                id: Date.now() + Math.random(),
+                damage: Math.floor(slot1.damage * 1.5)
+            };
+            
+            weapons.push(mergedWeapon);
+            
+            // Reset crafting slots
+            craftingSlots = [null, null];
+            document.querySelectorAll('.crafting-slot').forEach((slot, index) => {
+                slot.className = 'crafting-slot';
+                slot.innerHTML = `Slot ${index + 1}`;
+            });
+            
+            // Hide clear buttons
+            document.querySelectorAll('.clear-slot-btn').forEach(btn => {
+                btn.style.display = 'none';
+            });
+            
+            updateWeaponList();
+            
+            alert(`Weapons merged! New ${mergedWeapon.name} has ${mergedWeapon.damage} damage (1.5x increase)`);
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('weapon-selector-modal');
+            if (event.target === modal) {
+                closeWeaponSelector();
+            }
+        }
+
+        // Initialize
+        updateWeaponList();
+    </script>
+</body>
+</html> 

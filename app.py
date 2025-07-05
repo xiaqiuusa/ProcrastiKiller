@@ -1,0 +1,206 @@
+from flask import Flask, request, jsonify
+from datetime import datetime, timedelta
+import numpy as np
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+import json
+import random
+
+app = Flask(__name__)
+
+def parse_timestamp(timestamp_str):
+    """Parse timestamp string to datetime object"""
+    return datetime.fromisoformat(timestamp_str.replace('Z', '+00:00'))
+
+def get_time_of_day(hour):
+    """Categorize hour into time of day"""
+    if 5 <= hour < 12:
+        return "Morning"
+    elif 12 <= hour < 17:
+        return "Afternoon"
+    elif 17 <= hour < 22:
+        return "Evening"
+    else:
+        return "Night"
+
+def calculate_duration(created_at, completed_at):
+    """Calculate duration in minutes"""
+    duration = completed_at - created_at
+    return duration.total_seconds() / 60
+
+def extract_features(tasks):
+    """Extract features from task history"""
+    features = []
+    
+    for task in tasks:
+        created_at = parse_timestamp(task['createdAt'])
+        completed_at = parse_timestamp(task['completedAt'])
+        
+        # Duration in minutes
+        duration = calculate_duration(created_at, completed_at)
+        
+        # Time of day
+        hour = created_at.hour
+        time_of_day = get_time_of_day(hour)
+        
+        # Day of week (0=Monday, 6=Sunday)
+        day_of_week = created_at.weekday()
+        
+        # Task length (description length as proxy)
+        task_length = len(task.get('description', ''))
+        
+        features.append({
+            'duration': duration,
+            'hour': hour,
+            'time_of_day': time_of_day,
+            'day_of_week': day_of_week,
+            'task_length': task_length,
+            'completed': 1 if task['completed'] else 0
+        })
+    
+    return features
+
+def predict_best_time(features):
+    """Predict best time of day for focus using clustering"""
+    if len(features) < 2:
+        return "Afternoon"  # Default fallback
+    
+    # Extract productivity metrics (inverse of duration for completed tasks)
+    productivity_scores = []
+    time_of_day_counts = {"Morning": [], "Afternoon": [], "Evening": [], "Night": []}
+    
+    for feature in features:
+        if feature['completed']:
+            # Lower duration = higher productivity
+            productivity = 1 / (feature['duration'] + 1)  # Add 1 to avoid division by zero
+            time_of_day_counts[feature['time_of_day']].append(productivity)
+    
+    # Calculate average productivity for each time of day
+    time_productivity = {}
+    for time, scores in time_of_day_counts.items():
+        if scores:
+            time_productivity[time] = np.mean(scores)
+        else:
+            time_productivity[time] = 0
+    
+    # Return time of day with highest productivity
+    return max(time_productivity.items(), key=lambda x: x[1])[0]
+
+def predict_average_duration(features):
+    """Predict average completion duration"""
+    completed_durations = [f['duration'] for f in features if f['completed']]
+    
+    if not completed_durations:
+        return 30  # Default 30 minutes
+    
+    return round(np.mean(completed_durations))
+
+def predict_priority(features):
+    """Predict suggested priority using Random Forest"""
+    if len(features) < 3:
+        return "Medium"  # Default fallback
+    
+    # Create training data
+    X = []
+    y = []
+    
+    for feature in features:
+        if feature['completed']:
+            X.append([
+                feature['hour'],
+                feature['day_of_week'],
+                feature['task_length'],
+                feature['duration']
+            ])
+            
+            # Determine priority based on duration and task length
+            if feature['duration'] < 30 and feature['task_length'] < 50:
+                y.append(0)  # Low priority
+            elif feature['duration'] > 60 or feature['task_length'] > 100:
+                y.append(2)  # High priority
+            else:
+                y.append(1)  # Medium priority
+    
+    if len(set(y)) < 2:
+        return "Medium"  # Not enough variety in training data
+    
+    # Train Random Forest
+    try:
+        clf = RandomForestClassifier(n_estimators=10, random_state=42)
+        clf.fit(X, y)
+        
+        # Predict priority for a typical task
+        typical_task = [12, 2, 50, 45]  # Afternoon, Wednesday, medium length, 45 min
+        prediction = clf.predict([typical_task])[0]
+        
+        priority_map = {0: "Low", 1: "Medium", 2: "High"}
+        return priority_map[prediction]
+    except:
+        return "Medium"
+
+def get_motivational_quote():
+    """Return a random motivational quote"""
+    quotes = [
+        "Discipline beats motivation.",
+        "The only way to do great work is to love what you do.",
+        "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+        "The future depends on what you do today.",
+        "Don't watch the clock; do what it does. Keep going.",
+        "The only limit to our realization of tomorrow is our doubts of today.",
+        "It always seems impossible until it's done.",
+        "The way to get started is to quit talking and begin doing.",
+        "Your time is limited, don't waste it living someone else's life.",
+        "The best way to predict the future is to create it."
+    ]
+    return random.choice(quotes)
+
+@app.route('/predict-coach-tips', methods=['POST'])
+def predict_coach_tips():
+    """Analyze task history and provide productivity suggestions"""
+    try:
+        # Get input data
+        data = request.get_json()
+        
+        if not data or not isinstance(data, list):
+            return jsonify({'error': 'Invalid input format. Expected a list of tasks.'}), 400
+        
+        # Validate required fields
+        for task in data:
+            required_fields = ['title', 'description', 'createdAt', 'completed', 'completedAt']
+            for field in required_fields:
+                if field not in task:
+                    return jsonify({'error': f'Missing required field: {field}'}), 400
+        
+        # Extract features from task history
+        features = extract_features(data)
+        
+        if not features:
+            return jsonify({'error': 'No valid tasks found in input data.'}), 400
+        
+        # Generate predictions
+        best_time = predict_best_time(features)
+        average_duration = predict_average_duration(features)
+        priority = predict_priority(features)
+        quote = get_motivational_quote()
+        
+        # Prepare response
+        response = {
+            'best_time': best_time,
+            'average_duration': average_duration,
+            'priority': priority,
+            'quote': quote
+        }
+        
+        return jsonify(response)
+    
+    except Exception as e:
+        return jsonify({'error': f'An error occurred: {str(e)}'}), 500
+
+@app.route('/health', methods=['GET'])
+def health_check():
+    """Health check endpoint"""
+    return jsonify({'status': 'healthy', 'message': 'Productivity Coach API is running'})
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000) 
