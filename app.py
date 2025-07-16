@@ -1,13 +1,22 @@
-from flask import Flask, request, jsonify
-from datetime import datetime, timedelta
+from flask import Flask, request, jsonify, send_from_directory
+from datetime import datetime, timedelta, date
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 import json
 import random
+import os
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
+
+HABIT_PHOTO_FOLDER = 'habit_photos'
+os.makedirs(HABIT_PHOTO_FOLDER, exist_ok=True)
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def parse_timestamp(timestamp_str):
     """Parse timestamp string to datetime object"""
@@ -155,6 +164,29 @@ def get_motivational_quote():
     ]
     return random.choice(quotes)
 
+def calculate_streak(tasks):
+    """Calculate 7-day streak and progress bar"""
+    # Get all completed task dates
+    completed_dates = set()
+    for task in tasks:
+        if task.get('completed') and task.get('completedAt'):
+            try:
+                completed_date = parse_timestamp(task['completedAt']).date()
+                completed_dates.add(completed_date)
+            except Exception:
+                continue
+    
+    streak = 0
+    today = date.today()
+    for i in range(7):
+        day = today - timedelta(days=i)
+        if day in completed_dates:
+            streak += 1
+        else:
+            break
+    progress = int((streak / 7) * 100)
+    return streak, progress
+
 @app.route('/predict-coach-tips', methods=['POST'])
 def predict_coach_tips():
     """Analyze task history and provide productivity suggestions"""
@@ -184,12 +216,17 @@ def predict_coach_tips():
         priority = predict_priority(features)
         quote = get_motivational_quote()
         
+        # Calculate streak and progress
+        streak_days, streak_progress = calculate_streak(data)
+        
         # Prepare response
         response = {
             'best_time': best_time,
             'average_duration': average_duration,
             'priority': priority,
-            'quote': quote
+            'quote': quote,
+            'streak_days': streak_days,
+            'streak_progress': streak_progress
         }
         
         return jsonify(response)
@@ -201,6 +238,51 @@ def predict_coach_tips():
 def health_check():
     """Health check endpoint"""
     return jsonify({'status': 'healthy', 'message': 'Productivity Coach API is running'})
+
+@app.route('/upload-habit-photo', methods=['POST'])
+def upload_habit_photo():
+    """Accept a photo for a habit and run a placeholder AI check"""
+    if 'photo' not in request.files or 'habit_id' not in request.form:
+        return jsonify({'error': 'Missing photo or habit_id'}), 400
+    file = request.files['photo']
+    habit_id = request.form['habit_id']
+    habit_title = request.form.get('habit_title', '')
+    if file.filename == '' or not allowed_file(file.filename):
+        return jsonify({'error': 'Invalid or missing file'}), 400
+    filename = secure_filename(f"{habit_id}_{file.filename}")
+    filepath = os.path.join(HABIT_PHOTO_FOLDER, filename)
+    file.save(filepath)
+
+    # --- Placeholder AI logic ---
+    # 1. Check if image is likely from Google (filename contains 'google' or random chance)
+    if file.filename and ('google' in file.filename.lower() or random.random() < 0.1):
+        return jsonify({
+            'result': 'fail',
+            'confidence': 0.5,
+            'filename': filename,
+            'message': 'AI detected this image is likely from Google. Please take a real photo.'
+        })
+    # 2. Check if image correlates with the habit name (random fail for demo)
+    if habit_title and random.random() < 0.15:
+        return jsonify({
+            'result': 'fail',
+            'confidence': 0.6,
+            'filename': filename,
+            'message': f"AI could not verify this photo matches the habit: '{habit_title}'. Please try again with a more relevant photo."
+        })
+    # Otherwise, pass
+    result = 'pass'
+    confidence = round(random.uniform(0.85, 0.99), 2)
+    return jsonify({
+        'result': result,
+        'confidence': confidence,
+        'filename': filename,
+        'message': 'Photo accepted!'
+    })
+
+@app.route('/habit_photos/<filename>')
+def get_habit_photo(filename):
+    return send_from_directory(HABIT_PHOTO_FOLDER, filename)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000) 

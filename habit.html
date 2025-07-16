@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker with AI Photo Check</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 2rem auto;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+        h1 {
+            text-align: center;
+            color: #764ba2;
+        }
+        .habit-form {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .habit-input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .habit-list {
+            list-style: none;
+            padding: 0;
+        }
+        .habit-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .habit-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .photo-preview {
+            max-width: 120px;
+            max-height: 120px;
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            border: 1px solid #ddd;
+        }
+        .ai-result {
+            margin-top: 0.5rem;
+            font-weight: bold;
+        }
+        .ai-pass {
+            color: #28a745;
+        }
+        .ai-fail {
+            color: #dc3545;
+        }
+        @media (max-width: 700px) {
+            .container { padding: 1rem; }
+            .habit-form { flex-direction: column; gap: 0.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Habit Tracker <span style="font-size:1.5rem;">📸</span></h1>
+        <form class="habit-form" onsubmit="addHabit(event)">
+            <input type="text" id="habit-input" class="habit-input" placeholder="Enter a new habit (e.g. Drink water)" required>
+            <button type="submit" class="btn">Add Habit</button>
+        </form>
+        <ul id="habit-list" class="habit-list"></ul>
+    </div>
+    <script>
+        let habits = [];
+        let habitIdCounter = 1;
+
+        function addHabit(e) {
+            e.preventDefault();
+            const input = document.getElementById('habit-input');
+            const title = input.value.trim();
+            if (!title) return;
+            habits.push({ id: habitIdCounter++, title, photo: null, aiResult: null, aiConfidence: null });
+            input.value = '';
+            renderHabits();
+        }
+
+        function renderHabits() {
+            const list = document.getElementById('habit-list');
+            list.innerHTML = '';
+            habits.forEach(habit => {
+                const li = document.createElement('li');
+                li.className = 'habit-item';
+                li.innerHTML = `
+                    <div class="habit-title">${habit.title}</div>
+                    <input type="file" accept="image/*" capture="environment" style="margin-top:0.5rem;" onchange="uploadPhoto(event, ${habit.id})">
+                    <div id="photo-preview-${habit.id}"></div>
+                    <div id="ai-result-${habit.id}"></div>
+                `;
+                list.appendChild(li);
+                // Show preview and result if available
+                if (habit.photo) {
+                    showPhotoPreview(habit.id, habit.photo);
+                }
+                if (habit.aiResult) {
+                    showAIResult(habit.id, habit.aiResult, habit.aiConfidence);
+                }
+            });
+        }
+
+        function uploadPhoto(event, habitId) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const formData = new FormData();
+            formData.append('photo', file);
+            formData.append('habit_id', habitId);
+            fetch('/upload-habit-photo', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                const habit = habits.find(h => h.id === habitId);
+                if (data.filename) {
+                    habit.photo = `/habit_photos/${data.filename}`;
+                    showPhotoPreview(habitId, habit.photo);
+                }
+                if (data.result) {
+                    habit.aiResult = data.result;
+                    habit.aiConfidence = data.confidence;
+                    showAIResult(habitId, data.result, data.confidence);
+                }
+            })
+            .catch(() => {
+                showAIResult(habitId, 'fail', 0);
+            });
+        }
+
+        function showPhotoPreview(habitId, photoUrl) {
+            const previewDiv = document.getElementById(`photo-preview-${habitId}`);
+            previewDiv.innerHTML = `<img src="${photoUrl}" class="photo-preview">`;
+        }
+
+        function showAIResult(habitId, result, confidence) {
+            const resultDiv = document.getElementById(`ai-result-${habitId}`);
+            if (result === 'pass') {
+                resultDiv.innerHTML = `<span class="ai-result ai-pass">✅ Success! (Confidence: ${(confidence*100).toFixed(0)}%)</span>`;
+            } else {
+                resultDiv.innerHTML = `<span class="ai-result ai-fail">❌ Try again (Confidence: ${(confidence*100).toFixed(0)}%)</span>`;
+            }
+        }
+
+        // Initial render
+        renderHabits();
+    </script>
+</body>
+</html> 

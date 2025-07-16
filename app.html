@@ -1020,6 +1020,73 @@
         .locked {
             color: #dc3545;
         }
+
+        /* --- Habit Tracker Styles --- */
+        .habit-form {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .habit-input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .habit-list {
+            list-style: none;
+            padding: 0;
+        }
+        .habit-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .habit-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .photo-preview {
+            max-width: 120px;
+            max-height: 120px;
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            border: 1px solid #ddd;
+        }
+        .ai-result {
+            margin-top: 0.5rem;
+            font-weight: bold;
+        }
+        .ai-pass {
+            color: #28a745;
+        }
+        .ai-fail {
+            color: #dc3545;
+        }
+        @media (max-width: 700px) {
+            .habit-form { flex-direction: column; gap: 0.5rem; }
+        }
+        .habit-day {
+            color: #764ba2;
+            font-size: 1rem;
+            font-weight: normal;
+            margin-left: 0.5rem;
+        }
+        .habit-meta {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+        .checkin-desc-display {
+            margin-top: 0.5rem;
+            font-size: 0.97em;
+            color: #764ba2;
+        }
     </style>
 </head>
 <body>
@@ -1032,6 +1099,7 @@
                 <button class="nav-tab" onclick="showTab('gacha')">Gacha</button>
                 <button class="nav-tab" onclick="showTab('battle')">Battle</button>
                 <button class="nav-tab" onclick="showTab('crafting')">Crafting</button>
+                <button class="nav-tab" onclick="showTab('habits')">Habits</button>
                 <button class="nav-tab" onclick="showTab('profile')">Profile</button>
             </div>
             <div class="stats">
@@ -1280,6 +1348,17 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Habits Tab -->
+            <div id="habits" class="tab-content">
+                <h2 class="section-title">Habit Tracker <span style="font-size:1.5rem;">📸</span></h2>
+                <form class="habit-form" onsubmit="addHabit(event)">
+                    <input type="text" id="habit-input" class="habit-input" placeholder="Enter a new habit (e.g. Drink water)" required>
+                    <input type="number" id="habit-frequency" class="habit-input" min="1" value="3" style="max-width:90px;" title="Check-ins per day">
+                    <button type="submit" class="btn">Add Habit</button>
+                </form>
+                <ul id="habit-list" class="habit-list"></ul>
             </div>
         </div>
     </main>
@@ -2321,6 +2400,218 @@
 
         // Initialize game when page loads
         window.addEventListener('load', initGame);
+
+        // --- Habit Tracker JS ---
+        let habits = [];
+        let habitIdCounter = 1;
+
+        // Load habits from localStorage
+        function loadHabits() {
+            const saved = localStorage.getItem('procrastikiller_habits');
+            if (saved) {
+                habits = JSON.parse(saved);
+                // Set habitIdCounter to max existing id + 1
+                if (habits.length > 0) {
+                    habitIdCounter = Math.max(...habits.map(h => h.id)) + 1;
+                }
+            }
+        }
+
+        // Save habits to localStorage
+        function saveHabits() {
+            localStorage.setItem('procrastikiller_habits', JSON.stringify(habits));
+        }
+
+        const HABIT_TYPES = [
+            { value: 'drink_water', label: 'Drink Water', defaultFrequency: 3 },
+            { value: 'make_bed', label: 'Make Bed', defaultFrequency: 1 },
+            { value: 'custom', label: 'Custom', defaultFrequency: 1 }
+        ];
+
+        function addHabit(e) {
+            e.preventDefault();
+            const input = document.getElementById('habit-input');
+            const freqInput = document.getElementById('habit-frequency');
+            const title = input.value.trim();
+            const frequency = Math.max(1, parseInt(freqInput.value) || 1);
+            if (!title) return;
+            habits.push({
+                id: habitIdCounter++,
+                title,
+                frequency,
+                checkins: 0,
+                lastCheckinDate: '',
+                photo: null,
+                aiResult: null,
+                aiConfidence: null,
+                aiMessage: null,
+                streak: 1
+            });
+            input.value = '';
+            freqInput.value = frequency;
+            saveHabits();
+            renderHabits();
+        }
+
+        function renderHabits() {
+            const list = document.getElementById('habit-list');
+            if (!list) return;
+            list.innerHTML = '';
+            const today = new Date().toISOString().slice(0, 10);
+            habits.forEach(habit => {
+                // Reset checkins if new day
+                if (habit.lastCheckinDate !== today) {
+                    habit.checkins = 0;
+                    habit.lastCheckinDate = today;
+                    habit.lastCheckinDescription = '';
+                }
+                const li = document.createElement('li');
+                li.className = 'habit-item';
+                li.innerHTML = `
+                    <div class="habit-title">${habit.title} <span class="habit-day">Day ${habit.streak}</span></div>
+                    <div class="habit-meta">Check-ins: <b>${habit.checkins}/${habit.frequency}</b></div>
+                    <input type="file" id="habit-photo-input-${habit.id}" accept="image/*" capture="environment" style="display:none;" onchange="uploadPhoto(event, ${habit.id}, 'camera')">
+                    <input type="file" id="habit-upload-input-${habit.id}" accept="image/*" style="display:none;" onchange="uploadPhoto(event, ${habit.id}, 'upload')">
+                    <div style="display:flex; gap:0.5rem; margin:0.5rem 0;">
+                        <button class="btn" onclick="triggerCamera(${habit.id})">Open Camera</button>
+                        <button class="btn" onclick="triggerUpload(${habit.id})">Upload Photo</button>
+                    </div>
+                    <div id="photo-preview-${habit.id}"></div>
+                    <div id="ai-result-${habit.id}"></div>
+                    <div id="checkin-desc-box-${habit.id}"></div>
+                    <div id="checkin-desc-display-${habit.id}" class="checkin-desc-display"></div>
+                `;
+                list.appendChild(li);
+                // Show preview and result if available
+                if (habit.photo) {
+                    showPhotoPreview(habit.id, habit.photo);
+                }
+                if (habit.aiResult) {
+                    showAIResult(habit.id, habit.aiResult, habit.aiConfidence, habit.aiMessage);
+                }
+                // Show latest check-in description if available
+                if (habit.lastCheckinDescription) {
+                    showCheckinDescriptionDisplay(habit.id, habit.lastCheckinDescription);
+                }
+            });
+            saveHabits();
+        }
+
+        function getHabitTypeLabel(type) {
+            const found = HABIT_TYPES.find(t => t.value === type);
+            return found ? found.label : type;
+        }
+
+        function triggerCamera(habitId) {
+            const input = document.getElementById(`habit-photo-input-${habitId}`);
+            if (input) input.click();
+        }
+        function triggerUpload(habitId) {
+            const input = document.getElementById(`habit-upload-input-${habitId}`);
+            if (input) input.click();
+        }
+
+        function uploadPhoto(event, habitId, source) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const habit = habits.find(h => h.id === habitId);
+            const formData = new FormData();
+            formData.append('photo', file);
+            formData.append('habit_id', habitId);
+            formData.append('habit_type', habit.type);
+            formData.append('habit_title', habit.title);
+            fetch('/upload-habit-photo', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.filename) {
+                    habit.photo = `/habit_photos/${data.filename}`;
+                    showPhotoPreview(habitId, habit.photo);
+                }
+                if (data.result) {
+                    habit.aiResult = data.result;
+                    habit.aiConfidence = data.confidence;
+                    habit.aiMessage = data.message || '';
+                    showAIResult(habitId, data.result, data.confidence, data.message);
+                    if (data.result === 'pass') {
+                        const today = new Date().toISOString().slice(0, 10);
+                        if (habit.lastCheckinDate !== today) {
+                            habit.checkins = 0;
+                            habit.lastCheckinDate = today;
+                        }
+                        if (habit.checkins < habit.frequency) {
+                            habit.checkins += 1;
+                        }
+                        if (habit.checkins === habit.frequency) {
+                            habit.streak += 1;
+                        }
+                        saveHabits();
+                        renderHabits();
+                    } else {
+                        saveHabits();
+                    }
+                } else {
+                    saveHabits();
+                }
+            })
+            .catch(() => {
+                showAIResult(habitId, 'fail', 0, 'Upload failed');
+                saveHabits();
+            });
+        }
+
+        function showPhotoPreview(habitId, photoUrl) {
+            const previewDiv = document.getElementById(`photo-preview-${habitId}`);
+            previewDiv.innerHTML = `<img src="${photoUrl}" class="photo-preview">`;
+        }
+
+        function showAIResult(habitId, result, confidence, message) {
+            const resultDiv = document.getElementById(`ai-result-${habitId}`);
+            let msg = message ? `<br><span style='font-size:0.95em;'>${message}</span>` : '';
+            if (result === 'pass') {
+                resultDiv.innerHTML = `<span class="ai-result ai-pass">✅ Success! (Confidence: ${(confidence*100).toFixed(0)}%)${msg}</span>`;
+                showCheckinDescriptionBox(habitId);
+            } else {
+                resultDiv.innerHTML = `<span class="ai-result ai-fail">❌ Try again (Confidence: ${(confidence*100).toFixed(0)}%)${msg}</span>`;
+                document.getElementById(`checkin-desc-box-${habitId}`).innerHTML = '';
+            }
+        }
+
+        function showCheckinDescriptionBox(habitId) {
+            const boxDiv = document.getElementById(`checkin-desc-box-${habitId}`);
+            if (!boxDiv) return;
+            boxDiv.innerHTML = `
+                <form onsubmit="saveCheckinDescription(event, ${habitId})" style="margin-top:0.5rem;">
+                    <input type="text" id="checkin-desc-input-${habitId}" class="habit-input" placeholder="Describe this check-in (e.g. Drank 500ml water)" maxlength="100" required style="width:80%;">
+                    <button type="submit" class="btn" style="padding:0.5rem 1rem;">Save</button>
+                </form>
+            `;
+        }
+
+        function saveCheckinDescription(e, habitId) {
+            e.preventDefault();
+            const input = document.getElementById(`checkin-desc-input-${habitId}`);
+            const desc = input.value.trim();
+            if (!desc) return;
+            const habit = habits.find(h => h.id === habitId);
+            habit.lastCheckinDescription = desc;
+            showCheckinDescriptionDisplay(habitId, desc);
+            // Hide the input box
+            document.getElementById(`checkin-desc-box-${habitId}`).innerHTML = '';
+        }
+
+        function showCheckinDescriptionDisplay(habitId, desc) {
+            const displayDiv = document.getElementById(`checkin-desc-display-${habitId}`);
+            if (displayDiv) {
+                displayDiv.innerHTML = `<span style='color:#764ba2;font-size:0.98em;'>📝 ${desc}</span>`;
+            }
+        }
+
+        // Initial render for habits tab
+        loadHabits();
+        renderHabits();
     </script>
 </body>
 </html> 
