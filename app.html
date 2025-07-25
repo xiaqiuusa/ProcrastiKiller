@@ -2487,7 +2487,7 @@
                     showPhotoPreview(habit.id, habit.photo);
                 }
                 if (habit.aiResult) {
-                    showAIResult(habit.id, habit.aiResult, habit.aiConfidence, habit.aiMessage);
+                    showAIResult(habit.id, habit.aiResult, habit.aiConfidence);
                 }
                 // Show latest check-in description if available
                 if (habit.lastCheckinDescription) {
@@ -2524,8 +2524,21 @@
                 method: 'POST',
                 body: formData
             })
-            .then(res => res.json())
-            .then(data => {
+            .then(async res => {
+                let data;
+                try {
+                    data = await res.json();
+                } catch (e) {
+                    showAIResult(habitId, 'fail', 0, 'Upload failed: Invalid server response');
+                    saveHabits();
+                    return;
+                }
+                if (!res.ok) {
+                    // Show backend error message if present
+                    showAIResult(habitId, 'fail', 0, data.error || 'Upload failed');
+                    saveHabits();
+                    return;
+                }
                 if (data.filename) {
                     habit.photo = `/habit_photos/${data.filename}`;
                     showPhotoPreview(habitId, habit.photo);
@@ -2534,7 +2547,7 @@
                     habit.aiResult = data.result;
                     habit.aiConfidence = data.confidence;
                     habit.aiMessage = data.message || '';
-                    showAIResult(habitId, data.result, data.confidence, data.message);
+                    showAIResult(habitId, data.result, data.confidence);
                     if (data.result === 'pass') {
                         const today = new Date().toISOString().slice(0, 10);
                         if (habit.lastCheckinDate !== today) {
@@ -2556,8 +2569,8 @@
                     saveHabits();
                 }
             })
-            .catch(() => {
-                showAIResult(habitId, 'fail', 0, 'Upload failed');
+            .catch(err => {
+                showAIResult(habitId, 'fail', 0, 'Upload failed: ' + (err && err.message ? err.message : 'Network error'));
                 saveHabits();
             });
         }
@@ -2567,14 +2580,14 @@
             previewDiv.innerHTML = `<img src="${photoUrl}" class="photo-preview">`;
         }
 
-        function showAIResult(habitId, result, confidence, message) {
+        function showAIResult(habitId, result, confidence) {
             const resultDiv = document.getElementById(`ai-result-${habitId}`);
-            let msg = message ? `<br><span style='font-size:0.95em;'>${message}</span>` : '';
+            let msg = '';
             if (result === 'pass') {
-                resultDiv.innerHTML = `<span class="ai-result ai-pass">✅ Success! (Confidence: ${(confidence*100).toFixed(0)}%)${msg}</span>`;
+                resultDiv.innerHTML = `<span class="ai-result ai-pass">✅ Success!${msg}</span>`;
                 showCheckinDescriptionBox(habitId);
             } else {
-                resultDiv.innerHTML = `<span class="ai-result ai-fail">❌ Try again (Confidence: ${(confidence*100).toFixed(0)}%)${msg}</span>`;
+                resultDiv.innerHTML = `<span class="ai-result ai-fail">❌ Try again${msg}</span>`;
                 document.getElementById(`checkin-desc-box-${habitId}`).innerHTML = '';
             }
         }

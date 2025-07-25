@@ -284,5 +284,46 @@ def upload_habit_photo():
 def get_habit_photo(filename):
     return send_from_directory(HABIT_PHOTO_FOLDER, filename)
 
+# --- HTML Endpoints ---
+@app.route('/')
+def serve_index():
+    return send_from_directory('.', 'index.html')
+
+@app.route('/app')
+def serve_app():
+    return send_from_directory('.', 'app.html')
+
+@app.route('/demo')
+def serve_demo():
+    return send_from_directory('.', 'demo.html')
+
+@app.route('/help')
+def serve_help():
+    return send_from_directory('.', 'help.html')
+
+@app.route('/about')
+def serve_about():
+    return send_from_directory('.', 'about.html')
+
+@app.route('/terms')
+def serve_terms():
+    return send_from_directory('.', 'terms.html')
+
+@app.route('/contact')
+def serve_contact():
+    return send_from_directory('.', 'contact.html')
+
+@app.route('/privacy')
+def serve_privacy():
+    return send_from_directory('.', 'privacy.html')
+
+@app.route('/star-demo')
+def serve_star_demo():
+    return send_from_directory('.', 'star_demo.html')
+
+@app.route('/crafting-demo')
+def serve_crafting_demo():
+    return send_from_directory('.', 'crafting_demo.html')
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000) 
