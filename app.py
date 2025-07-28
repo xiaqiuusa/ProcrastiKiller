@@ -290,6 +290,7 @@ def serve_index():
     return send_from_directory('.', 'index.html')
 
 @app.route('/app')
+@app.route('/app.html')
 def serve_app():
     return send_from_directory('.', 'app.html')
 
